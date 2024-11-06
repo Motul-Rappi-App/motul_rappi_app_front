@@ -49,4 +49,3 @@ module.exports = {
   },
   plugins: [],
 }
->>>>>>> c27369463310b65678b96f3bacf8e06c4233db0e
