@@ -1,19 +1,27 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { RecaptchaModule } from 'ng-recaptcha';
+import { FormsContainerComponent } from "../../../layouts/forms-container/forms-container.component";
 
 @Component({
   selector: 'app-user-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent],
   templateUrl: './user-login.component.html',
   styleUrls: ['./user-login.component.css']
 })
 export class UserLoginComponent {
+
   loginForm: FormGroup;
+  captchaResolved: boolean = false;
+  recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
+
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private _toast: ToastrService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -21,11 +29,25 @@ export class UserLoginComponent {
     });
   }
 
+  resolved(captchaResponse: string | null) {
+
+    if (captchaResponse === null) {
+      this._toast.error('Error al validar captcha');
+      this.captchaResolved = false;
+      return;
+    }
+
+    this.captchaResolved = true;
+    console.log(`Resolved captcha with response: ${captchaResponse}`);
+  }
+
   onSubmit() {
-    if (this.loginForm.valid) {
-      console.log('Formulario válido:', this.loginForm.value);
+    if (this.loginForm.valid && this.captchaResolved) {
+      // console.log('Formulario válido:', this.loginForm.value);
+      this._toast.success('Bienvenido');
     } else {
-      console.log('Formulario inválido');
+      this._toast.error('Formulario inválido');
+      // console.log('Formulario inválido');
     }
   }
 
