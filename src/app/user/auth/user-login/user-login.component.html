@@ -1,58 +1,63 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700">
-    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-      <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-        Accede a tu cuenta
-      </h1>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4 md:space-y-6">
-        <!-- Email Input con validación -->
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="jhondoe@gmail.com"
-          />
-          <p *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
-            <span *ngIf="email?.errors?.['required']">Email es requerido.</span>
-            <span *ngIf="email?.errors?.['email']">Ingresa un email válido.</span>
-          </p>
-        </div>
+<app-forms-container title="Accede a tu Cuenta">
 
-        <!-- Password Input con validación -->
-        <div>
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            id="password"
-            formControlName="password"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="••••••••"
-          />
-          <p *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-sm mt-1">
-            <span *ngIf="password?.errors?.['required']">La contraseña es requerida.</span>
-            <span *ngIf="password?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
-          </p>
-        </div>
-
-        <!-- Enlace para Olvidaste tu Contraseña -->
-        <div class="flex items-center justify-between">
-          <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
-
-        <!-- Botón de envío -->
-        <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-          Iniciar sesión
-        </button>
-      </form>
+  <form [formGroup]="loginForm" 
+        (ngSubmit)="onSubmit()" 
+        class="space-y-4 md:space-y-6">
+    <!-- Email Input con validación -->
+    <div>
+      <label  for="email" 
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Email
+      </label>
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Ingrese el correo de su negocio"
+      />
+      <p *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
+        <span *ngIf="email?.errors?.['required']">Email es obligatorio.</span>
+        <span *ngIf="email?.errors?.['email']">Ingresa un email válido</span>
+      </p>
     </div>
-  </div>
-</section>
+
+    <!-- Password Input con validación -->
+    <div>
+      <label  for="password" 
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Contraseña
+      </label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Contraseña"
+      />
+      <p *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-sm mt-1">
+        <span *ngIf="password?.errors?.['required']">La contraseña es requerida.</span>
+        <span *ngIf="password?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
+      </p>
+    </div>
+    <!-- Enlace para Olvidaste tu Contraseña -->
+    <div class="flex-col items-center justify-between">
+
+      <re-captcha (resolved)="resolved($event)" 
+                  [siteKey]="recaptchaSiteKey"></re-captcha>
+
+      <a  href="#" 
+          class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+
+    <!-- Botón de envío -->
+    <button type="submit" 
+            class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            *ngIf="captchaResolved && loginForm.valid">
+      Iniciar sesión
+    </button>
+  </form>
+</app-forms-container>
+      
