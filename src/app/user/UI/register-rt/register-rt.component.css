@@ -1,0 +1,18 @@
+select {
+    background-color: #1f2937 ; 
+    color: white; 
+}
+
+select option {
+    background-color: #1f2937; 
+    color: white; 
+}
+
+select:focus {
+    background-color: #1f2937;
+    color: white;
+}
+
+.custom-select-height {
+    height: 40px; 
+}

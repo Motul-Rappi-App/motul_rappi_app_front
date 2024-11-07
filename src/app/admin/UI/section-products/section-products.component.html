@@ -1,1 +1,14 @@
-<p>section-products works!</p>
+<div class="p-8 text-gray-100 min-h-screen">
+  <h1 class="text-3xl font-bold text-gray-100 mb-6">Administrar Productos</h1>
+  <div class="grid grid-cols-1 md:grid-cols-6 gap-8">
+    <app-oils-list [oilsList]="oilsList" (editOil)="onEditOil($event)" (deleteOil)="onDeleteOil($event)"
+      class="md:col-span-4"></app-oils-list>
+
+    <app-oil-form [selectedOil]="selectedOil" (addOil)="onAddOil($event)" (updateOil)="onUpdateOil($event)"
+      class="md:col-span-2"></app-oil-form>
+
+    <app-viscosities-list [viscositiesList]="viscositiesList" class="md:col-span-4 mt-8"></app-viscosities-list>
+
+    <app-viscosities-form (addViscosity)="onAddViscosity($event)" class="md:col-span-2 mt-8"></app-viscosities-form>
+  </div>
+</div>

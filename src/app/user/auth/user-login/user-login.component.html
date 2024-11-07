@@ -3,10 +3,9 @@
   <form [formGroup]="loginForm" 
         (ngSubmit)="onSubmit()" 
         class="space-y-4 md:space-y-6">
-    <!-- Email Input con validación -->
+
     <div>
-      <label  for="email" 
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      <label  for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Email
       </label>
       <input
@@ -22,10 +21,8 @@
       </p>
     </div>
 
-    <!-- Password Input con validación -->
     <div>
-      <label  for="password" 
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      <label  for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Contraseña
       </label>
       <input
@@ -40,24 +37,25 @@
         <span *ngIf="password?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
       </p>
     </div>
-    <!-- Enlace para Olvidaste tu Contraseña -->
+
     <div class="flex-col items-center justify-between">
 
-      <re-captcha (resolved)="resolved($event)" 
-                  [siteKey]="recaptchaSiteKey"></re-captcha>
+      <div class="w-full max-w-[180px] sm:max-w-[100px] md:max-w-[100px] lg:max-w-[50px] scale-90 sm:scale-80 md:scale-75 lg:scale-90">
+        <re-captcha (resolved)="resolved($event)" [siteKey]="recaptchaSiteKey"></re-captcha>
+      </div>    
 
-      <a  href="#" 
-          class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+      <a  href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
         ¿Olvidaste tu contraseña?
       </a>
+
     </div>
 
-    <!-- Botón de envío -->
     <button type="submit" 
             class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             *ngIf="captchaResolved && loginForm.valid">
       Iniciar sesión
     </button>
+    
   </form>
 </app-forms-container>
       
