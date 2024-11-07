@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-login',
@@ -20,7 +21,8 @@ export class AdminLoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private _toast: ToastrService
+    private _toast: ToastrService,
+    private router: Router,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -45,11 +47,16 @@ export class AdminLoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid && this.captchaResolved) {
-      // console.log('Formulario válido:', this.loginForm.value);
+
+      console.log('Formulario válido:', this.loginForm.value);
+
       this._toast.success('Bienvenido', 'Ingreso exitoso', {
         timeOut: 3000,
         progressBar: true,
       });
+
+      this.router.navigate(['/admin/lobby']);
+
     } else {
       this._toast.error('Formulario inválido', 'Error al ingresar', {
         timeOut: 3000,
