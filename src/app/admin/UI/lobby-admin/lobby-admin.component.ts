@@ -16,7 +16,7 @@ export class LobbyAdminComponent {
 
   goToComercios() {
     console.log('Sección Comercios');  
-    this.router.navigate(['/admin/store']);
+    this.router.navigate(['/admin/sellers']);
   }
 
   goToProductos() {
