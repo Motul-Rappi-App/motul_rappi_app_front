@@ -1,1 +1,32 @@
-<p>redeem-discount works!</p>
+<app-forms-container title="Redimir Descuento">
+
+    <form [formGroup]="redeemForm" (ngSubmit)="onSubmit()" class="space-y-4 md:space-y-6">
+  
+      <!-- Cédula -->
+        <div>
+            <label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Cédula
+            </label>
+            <input
+            type="text"
+            id="cedula"
+            formControlName="cedula"
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Ej. 123456789"
+            maxlength="14"/>
+            <p *ngIf="cedula?.invalid && (cedula?.dirty || cedula?.touched)" class="text-red-500 text-sm mt-1">
+                <span *ngIf="cedula?.errors?.['required']">La cédula es obligatoria.</span>
+                <span *ngIf="cedula?.errors?.['pattern']">Debe contener solo números enteros.</span>
+                <span *ngIf="cedula?.errors?.['minlength']">Debe tener al menos 8 caracteres.</span>
+            </p>                 
+        </div>
+
+        <button
+            type="submit"
+            class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            *ngIf="redeemForm.valid">
+            Redimir Descuento
+        </button>
+      
+    </form>
+  </app-forms-container>
