@@ -1,0 +1,32 @@
+<form [formGroup]="viscosityForm" (ngSubmit)="onSubmit()" class="bg-gray-900 p-6 rounded-lg shadow-lg max-w-sm ">
+    <h2 class="text-xl font-semibold text-gray-100 mb-6">Añadir Viscosidad</h2>
+    <div class="mb-4">
+        <label for="description" class="block text-gray-400 text-sm font-bold mb-2">Viscosidad</label>
+        <input id="description" formControlName="description" type="text" placeholder="Introduce la viscosidad"
+            class="w-full px-4 py-2 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+        <div *ngIf="viscosityForm.get('description')?.invalid && (viscosityForm.get('description')?.dirty || viscosityForm.get('description')?.touched)"
+            class="text-red-500 text-sm mt-1">
+            <span *ngIf="viscosityForm.get('description')?.errors?.['required']">La descripción es obligatoria.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['minlength']">Debe tener al menos 3
+                caracteres.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['maxlength']">Debe tener menos de 50
+                caracteres.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['pattern']">Solo se permiten letras y
+                números.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['whitespace']">No puede contener solo espacios en
+                blanco.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['consecutiveCharacters']">No puede contener
+                caracteres repetidos consecutivos.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['onlyNumbers']">No puede ser solo numérico.</span>
+            <span *ngIf="viscosityForm.get('description')?.errors?.['forbiddenWord']">Contiene palabras
+                prohibidas.</span>
+        </div>
+    </div>
+
+    <button type="submit" [ngClass]="{
+          'bg-green-700 hover:bg-green-800': viscosityForm.valid,
+          'bg-gray-700 cursor-not-allowed': viscosityForm.invalid
+        }" class="text-white font-semibold py-2 px-4 rounded-lg w-full" [disabled]="viscosityForm.invalid">
+        Añadir Viscosidad
+    </button>
+</form>

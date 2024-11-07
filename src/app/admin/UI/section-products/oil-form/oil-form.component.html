@@ -1,0 +1,39 @@
+<form [formGroup]="oilForm" (ngSubmit)="onSubmit()" class="bg-gray-900 p-6 rounded-lg shadow-lg">
+  <h2 class="text-xl font-semibold text-gray-100 mb-4">{{ formTitle }}</h2>
+  <div class="mb-4">
+    <label for="name" class="block text-gray-400 text-sm font-bold mb-2">Nombre de Aceite</label>
+    <input id="name" formControlName="name" type="text" placeholder="Introduce el nombre del aceite"
+      class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+    <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="text-red-500 text-sm mt-1">
+      <span *ngIf="name?.errors?.['required']">El nombre es obligatorio.</span>
+      <span *ngIf="name?.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+      <span *ngIf="name?.errors?.['maxlength']">Debe tener menos de 50 caracteres.</span>
+      <span *ngIf="name?.errors?.['pattern']">Solo se permiten letras y números.</span>
+      <span *ngIf="name?.errors?.['whitespace']">No puede contener solo espacios en blanco.</span>
+      <span *ngIf="name?.errors?.['consecutiveCharacters']">No puede contener caracteres repetidos consecutivos.</span>
+      <span *ngIf="name?.errors?.['onlyNumbers']">No puede ser solo numérico.</span>
+      <span *ngIf="name?.errors?.['forbiddenWord']">Contiene palabras prohibidas.</span>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <label for="viscosities" class="block text-gray-400 text-sm font-bold mb-2">Seleccionar Viscosidad</label>
+    
+    <input type="text" [(ngModel)]="searchTerm" [ngModelOptions]="{standalone: true}" placeholder="Buscar viscosidad..."
+      class="w-full px-4 py-2 mb-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+  
+    <select id="viscosities" formControlName="viscosities" multiple
+      class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
+      <option *ngIf="filteredViscosities().length === 0" disabled>No hay viscosidades disponibles</option>
+      <option *ngFor="let viscosity of filteredViscosities()" [value]="viscosity.id">
+        {{ viscosity.description }}
+      </option>
+    </select>
+  </div>
+  <button type="submit" [ngClass]="{
+    'bg-green-700 hover:bg-green-800': oilForm.valid,
+    'bg-gray-700 cursor-not-allowed': oilForm.invalid
+  }" class="text-white font-semibold py-2 px-4 rounded-lg w-full" [disabled]="oilForm.invalid">
+    {{ submitButtonText }}
+  </button>
+</form>
