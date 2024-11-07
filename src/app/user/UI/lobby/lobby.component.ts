@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-lobby',
@@ -9,4 +10,17 @@ import { Component } from '@angular/core';
 })
 export class LobbyComponent {
 
+  constructor(
+    private router: Router,
+  ) {}
+
+  goToRedeem() {
+    console.log('Sección Redimir');  
+    this.router.navigate(['/sellers/reedem']);
+  }
+
+  goToRegister() {
+    console.log('Sección Inscribir');  
+    this.router.navigate(['/sellers/registerrt']);
+  }
 }
