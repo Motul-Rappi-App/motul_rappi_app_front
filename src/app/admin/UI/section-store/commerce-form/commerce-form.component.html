@@ -1,0 +1,74 @@
+<form [formGroup]="commerceForm" (ngSubmit)="onSubmit()" class="bg-gray-900 p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold text-gray-100 mb-4">{{ formTitle }}</h2>
+
+    <div class="mb-4">
+        <label for="name" class="block text-gray-400 text-sm font-bold mb-2">Nombre de Comercio</label>
+        <input id="name" formControlName="name" type="text" placeholder="Introduce el nombre del comercio"
+            class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+        <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="text-red-500 text-sm mt-1">
+            <span *ngIf="name?.errors?.['required']">El nombre es obligatorio.</span>
+            <span *ngIf="name?.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+            <span *ngIf="name?.errors?.['maxlength']">Debe tener menos de 50 caracteres.</span>
+            <span *ngIf="name?.errors?.['pattern']">Solo se permiten letras y números.</span>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label for="nit" class="block text-gray-400 text-sm font-bold mb-2">NIT</label>
+        <input id="nit" formControlName="nit" type="text" maxlength="11" placeholder="Introduce el NIT del comercio"
+            class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+        <div *ngIf="commerceForm.get('nit')?.invalid && (commerceForm.get('nit')?.dirty || commerceForm.get('nit')?.touched)"
+            class="text-red-500 text-sm mt-1">
+            <span *ngIf="commerceForm.get('nit')?.errors?.['required']">El NIT es obligatorio.</span>
+            <span *ngIf="commerceForm.get('nit')?.errors?.['pattern']">Debe contener solo números.</span>
+            <span *ngIf="commerceForm.get('nit')?.errors?.['minlength']">Debe tener al menos 5 caracteres.</span>
+            <span *ngIf="commerceForm.get('nit')?.errors?.['maxlength']">Debe tener menos de 20 caracteres.</span>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label for="email" class="block text-gray-400 text-sm font-bold mb-2">Correo Electrónico</label>
+        <input id="email" formControlName="email" type="email" placeholder="Introduce el correo electrónico"
+            class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+        <div *ngIf="commerceForm.get('email')?.invalid && (commerceForm.get('email')?.dirty || commerceForm.get('email')?.touched)"
+            class="text-red-500 text-sm mt-1">
+            <span *ngIf="commerceForm.get('email')?.errors?.['required']">El correo es obligatorio.</span>
+            <span *ngIf="commerceForm.get('email')?.errors?.['email']">Debe ser un correo válido.</span>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label for="password" class="block text-gray-400 text-sm font-bold mb-2">Contraseña</label>
+        <input id="password" formControlName="password" type="password" placeholder="Introduce la contraseña"
+            class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
+        <div *ngIf="commerceForm.get('password')?.invalid && (commerceForm.get('password')?.dirty || commerceForm.get('password')?.touched)"
+            class="text-red-500 text-sm mt-1">
+            <span *ngIf="commerceForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
+            <span *ngIf="commerceForm.get('password')?.errors?.['minlength']">Debe tener al menos 8 caracteres.</span>
+            <span *ngIf="commerceForm.get('password')?.errors?.['pattern']">Debe incluir al menos una letra y un
+                número.</span>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label for="cities" class="block text-gray-400 text-sm font-bold mb-2">Ciudad</label>
+        <select id="cities" formControlName="cities"
+            class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
+            <option *ngIf="filteredCities().length === 0" disabled>No hay ciudades disponibles</option>
+            <option *ngFor="let city of filteredCities()" [value]="city.id">
+                {{ city.name }}
+            </option>
+        </select>
+        <div *ngIf="commerceForm.get('cities')?.invalid && (commerceForm.get('cities')?.dirty || commerceForm.get('cities')?.touched)"
+            class="text-red-500 text-sm mt-1">
+            Selecciona una ciudad.
+        </div>
+    </div>
+
+    <button type="submit" [ngClass]="{
+        'bg-green-700 hover:bg-green-800': commerceForm.valid,
+        'bg-gray-700 cursor-not-allowed': commerceForm.invalid
+      }" class="text-white font-semibold py-2 px-4 rounded-lg w-full" [disabled]="commerceForm.invalid">
+        {{ submitButtonText }}
+    </button>
+</form>
