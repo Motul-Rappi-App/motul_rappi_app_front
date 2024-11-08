@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { FormsContainerComponent } from "../../../layouts/forms-container/forms-container.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-login',
@@ -21,7 +22,8 @@ export class UserLoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private _toast: ToastrService
+    private _toast: ToastrService,
+     private router: Router
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -51,6 +53,7 @@ export class UserLoginComponent {
         timeOut: 3000,
         progressBar: true,
       });
+      this.router.navigate(['/sellers/lobby']);
     } else {
       this._toast.error('Formulario inválido', 'Error al ingresar', {
         timeOut: 3000,
