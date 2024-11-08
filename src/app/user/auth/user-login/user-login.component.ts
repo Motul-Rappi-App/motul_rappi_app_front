@@ -32,7 +32,10 @@ export class UserLoginComponent {
   resolved(captchaResponse: string | null) {
 
     if (captchaResponse === null) {
-      this._toast.error('Error al validar captcha');
+      this._toast.error('Error al validar captcha', 'Error',{
+        timeOut: 3000,
+        progressBar: true,
+      });
       this.captchaResolved = false;
       return;
     }
@@ -44,9 +47,15 @@ export class UserLoginComponent {
   onSubmit() {
     if (this.loginForm.valid && this.captchaResolved) {
       // console.log('Formulario válido:', this.loginForm.value);
-      this._toast.success('Bienvenido');
+      this._toast.success('Bienvenido', 'Ingreso exitoso', {
+        timeOut: 3000,
+        progressBar: true,
+      });
     } else {
-      this._toast.error('Formulario inválido');
+      this._toast.error('Formulario inválido', 'Error al ingresar', {
+        timeOut: 3000,
+        progressBar: true,
+      });
       // console.log('Formulario inválido');
     }
   }
