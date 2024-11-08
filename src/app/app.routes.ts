@@ -13,6 +13,7 @@ import { SectionDownloadComponent } from './admin/UI/section-download/section-do
 import { SectionStoreComponent } from './admin/UI/section-store/section-store.component';
 import { AdminLoginComponent } from './admin/auth/admin-login/admin-login.component';
 import { LobbyAdminComponent } from './admin/UI/lobby-admin/lobby-admin.component';
+import { ForgotPasswordComponent } from './user/auth/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
     {
@@ -21,6 +22,10 @@ export const routes: Routes = [
             {
                 path: 'login',
                 component: UserLoginComponent
+            },
+            {
+                path: 'forgot-password',
+                component: ForgotPasswordComponent
             },
             {
                 path: 'lobby',
