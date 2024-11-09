@@ -5,6 +5,11 @@ import { ToastrService } from 'ngx-toastr';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { FormsContainerComponent } from "../../../layouts/forms-container/forms-container.component";
 import { Router } from '@angular/router';
+import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
+import { environment } from '../../../../environments/environment.development';
+
 
 @Component({
   selector: 'app-user-login',
@@ -23,7 +28,9 @@ export class UserLoginComponent {
   constructor(
     private fb: FormBuilder,
     private _toast: ToastrService,
-     private router: Router
+    private router: Router,
+    private jwtServ: JwtLocalManageService,
+    private authServ: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -34,10 +41,7 @@ export class UserLoginComponent {
   resolved(captchaResponse: string | null) {
 
     if (captchaResponse === null) {
-      this._toast.error('Error al validar captcha', 'Error',{
-        timeOut: 3000,
-        progressBar: true,
-      });
+      this._toast.error('Error al validar captcha', 'Error',environment.TOAST_CONFIG);
       this.captchaResolved = false;
       return;
     }
@@ -47,21 +51,50 @@ export class UserLoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.valid && this.captchaResolved) {
-      this._toast.success('Bienvenido', 'Ingreso exitoso', {
-        timeOut: 3000,
-        progressBar: true,
-      });
-      this.router.navigate(['/sellers/lobby']);
-    } else {
-      this._toast.error('Formulario inválido', 'Error al ingresar', {
-        timeOut: 3000,
-        progressBar: true,
-      });
+    if (this.validateIsFormInvalid) {
+      this.invalidForm();
+      return;
     }
+
+    this.sendFormToValidateCredentials();
   }
 
-  get email() {return this.loginForm.get('email');}
-  get password() {return this.loginForm.get('password');}
-  
+  sendFormToValidateCredentials(){
+    const authRequest: AuthenticationRequestEntitie = {
+      email: this.loginForm.get('email')?.value,
+      password: this.loginForm.get('password')?.value
+    }
+
+    this.authServ.login(authRequest)!.subscribe({
+      next: (data) => {
+        this.successLogin(data);
+      },
+      error: (err) => {
+        console.log(err)
+        this.noSuccessLogin(err.error);
+        }
+      }) 
+  }
+
+  noSuccessLogin(error: string){
+    this._toast.error('Error iniciando sesión', error, environment.TOAST_CONFIG);
+  }
+
+  successLogin(data: AuthenticationResponseEntitie){
+     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+      this.jwtServ.setTokenToLocal(data.token);
+      this.router.navigate(['/admin/lobby']);
+  }
+
+  invalidForm(){
+    this._toast.error('Formulario inválido', 'Por favor complete los campos de forma correcta', environment.TOAST_CONFIG);
+  }
+
+  get validateIsFormInvalid() {
+    return !this.loginForm.valid && !this.captchaResolved;
+  }
+
+  get email() { return this.loginForm.get('email') }
+  get password() { return this.loginForm.get('password') }
+
 }

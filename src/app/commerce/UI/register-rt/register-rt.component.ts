@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register-rt',
