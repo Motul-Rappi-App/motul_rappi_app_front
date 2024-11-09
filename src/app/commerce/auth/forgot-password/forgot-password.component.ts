@@ -50,4 +50,3 @@ export class ForgotPasswordComponent {
     this.showSuccessModal = false;
   }
 }
-

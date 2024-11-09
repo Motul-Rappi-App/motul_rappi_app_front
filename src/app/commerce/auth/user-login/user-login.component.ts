@@ -1,27 +1,29 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
+import { FormsContainerComponent } from "../../../layouts/forms-container/forms-container.component";
 import { Router } from '@angular/router';
 import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
 import { environment } from '../../../../environments/environment.development';
 
+
 @Component({
-  selector: 'app-admin-login',
+  selector: 'app-user-login',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent],
-  templateUrl: './admin-login.component.html',
-  styleUrl: './admin-login.component.css'
+  templateUrl: './user-login.component.html',
+  styleUrls: ['./user-login.component.css']
 })
-export class AdminLoginComponent {
+export class UserLoginComponent {
 
   loginForm: FormGroup;
   captchaResolved: boolean = false;
   recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
+
 
   constructor(
     private fb: FormBuilder,
@@ -39,16 +41,16 @@ export class AdminLoginComponent {
   resolved(captchaResponse: string | null) {
 
     if (captchaResponse === null) {
-      this._toast.error('Error al validar captcha', 'Error', environment.TOAST_CONFIG);
+      this._toast.error('Error al validar captcha', 'Error',environment.TOAST_CONFIG);
       this.captchaResolved = false;
       return;
     }
 
     this.captchaResolved = true;
+    console.log(`Resolved captcha with response: ${captchaResponse}`);
   }
 
   onSubmit() {
-
     if (this.validateIsFormInvalid) {
       this.invalidForm();
       return;
@@ -79,9 +81,9 @@ export class AdminLoginComponent {
   }
 
   successLogin(data: AuthenticationResponseEntitie){
-    this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
-    this.jwtServ.setTokenToLocal(data.token);
-    this.router.navigate(['/admin/lobby']);
+     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+      this.jwtServ.setTokenToLocal(data.token);
+      this.router.navigate(['/admin/lobby']);
   }
 
   invalidForm(){
@@ -94,4 +96,5 @@ export class AdminLoginComponent {
 
   get email() { return this.loginForm.get('email') }
   get password() { return this.loginForm.get('password') }
+
 }
