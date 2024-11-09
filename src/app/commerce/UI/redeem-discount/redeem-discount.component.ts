@@ -4,17 +4,19 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { SpinnerComponent } from '../../../shared/spinner/spinner.component';
 
 @Component({
   selector: 'app-redeem-discount',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsContainerComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsContainerComponent, SpinnerComponent],
   templateUrl: './redeem-discount.component.html',
   styleUrl: './redeem-discount.component.css'
 })
 export class RedeemDiscountComponent {
 
   redeemForm: FormGroup;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +29,7 @@ export class RedeemDiscountComponent {
   }
 
   onSubmit() {
+    this.isLoading = true;
     if (this.redeemForm.valid) {
       const cedulaValue = this.getCedula?.value || '';
   
@@ -39,11 +42,13 @@ export class RedeemDiscountComponent {
 
 
         // Redirigimos al componente feedback-discount con el estado
-        this.router.navigate(['/sellers/feedback'], { 
+        this.isLoading = false;
+        this.router.navigate(['/commerce/feedback'], { 
           state: { cedula: cedulaValue, valid: isValid, message: message }
         });
       });
     } else {
+      this.isLoading = false;
       this._toast.error('Formulario inválido', 'Error al verificar', {
         timeOut: 3000,
         progressBar: true,

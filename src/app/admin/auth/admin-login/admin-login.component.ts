@@ -9,11 +9,12 @@ import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.s
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
 import { environment } from '../../../../environments/environment.development';
+import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent],
+  imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent, SpinnerComponent],
   templateUrl: './admin-login.component.html',
   styleUrl: './admin-login.component.css'
 })
@@ -22,6 +23,7 @@ export class AdminLoginComponent {
   loginForm: FormGroup;
   captchaResolved: boolean = false;
   recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +55,7 @@ export class AdminLoginComponent {
       this.invalidForm();
       return;
     }
-
+    this.isLoading = true;
     this.sendFormToValidateCredentials();
   }
 
@@ -65,8 +67,10 @@ export class AdminLoginComponent {
 
     this.authServ.login(authRequest)!.subscribe({
       next: (data) => {
+        this.isLoading = false;
         this.successLogin(data);
       },error: (err) => {
+        this.isLoading = false;
         console.log(err)
         this.noSuccessLogin(err.error);
       }}) 
