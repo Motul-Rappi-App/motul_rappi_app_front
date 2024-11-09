@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,7 @@ import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
   templateUrl: './admin-login.component.html',
   styleUrl: './admin-login.component.css'
 })
-export class AdminLoginComponent {
+export class AdminLoginComponent implements OnInit {
 
   loginForm: FormGroup;
   captchaResolved: boolean = false;
@@ -34,7 +34,21 @@ export class AdminLoginComponent {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]]
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(9), Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.verifyIfLoggedIn();
+  }
+
+  verifyIfLoggedIn(): void {
+    this.isLoading = true;
+    this.authServ.checkIfLoggedIn().subscribe(isLoggedIn => {
+      this.isLoading = false;
+      if (isLoggedIn) {
+        this.router.navigate(['/admin/lobby-admin']);
+      }
     });
   }
 
@@ -72,7 +86,7 @@ export class AdminLoginComponent {
       },error: (err) => {
         this.isLoading = false;
         console.log(err)
-        this.noSuccessLogin(err.error);
+        this.noSuccessLogin(err.error.error);
       }}) 
   }
 
@@ -84,7 +98,7 @@ export class AdminLoginComponent {
   successLogin(data: AuthenticationResponseEntitie){
     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
     this.jwtServ.setTokenToLocal(data.token);
-    this.router.navigate(['/admin/lobby']);
+    this.router.navigate(['/admin/lobby-admin']);
   }
 
   invalidForm(){
