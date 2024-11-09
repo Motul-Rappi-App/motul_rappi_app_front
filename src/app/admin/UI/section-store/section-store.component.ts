@@ -1,35 +1,35 @@
 import { Component, OnInit } from '@angular/core';
-import { CityFormComponent } from './city-form/city-form.component';
-import { CityListComponent } from './city-list/city-list.component';
 import { CommerceFormComponent } from './commerce-form/commerce-form.component';
 import { CommerceListComponent } from './commerce-list/commerce-list.component';
-import { City } from '../../models/city.model';
-import { CitiesService } from '../../services/cities.service';
 import { Commerce } from '../../models/commerce.model';
 import { CommerceService } from '../../services/commerce.service';
+import { LocationRequestEntitie, LocationResponseEntitie } from '../../../core/models';
+import { LocationsService } from '../../services/locations.service';
+import { CityListComponent } from './location-list/city-list.component';
+import { CityFormComponent } from './location-form/city-form.component';
 
 @Component({
   selector: 'app-section-store',
   standalone: true,
-  imports: [CityFormComponent, CityListComponent, CommerceFormComponent, CommerceListComponent],
+  imports: [CommerceFormComponent, CommerceListComponent, CityListComponent, CityFormComponent],
   templateUrl: './section-store.component.html',
   styleUrl: './section-store.component.css'
 })
 export class SectionStoreComponent implements OnInit {
 
-  citiesList: City[] = [];
+  locationsList: LocationResponseEntitie[] = [];
   commerceList: Commerce[] = [];
   selectedCommerce: Commerce | null = null;
 
   constructor(
-    private citiesService: CitiesService,
+    private locationsService: LocationsService,
     private commerceService: CommerceService
   ) { }
 
   ngOnInit(): void {
-    this.citiesService.cities$.subscribe(data => {
-      this.citiesList = data;
-    })
+    this.locationsService.getLocations().subscribe(data => {
+      this.locationsList = data;
+    });
 
     this.commerceService.commerces$.subscribe(data => {
       this.commerceList = data;
@@ -53,8 +53,10 @@ export class SectionStoreComponent implements OnInit {
     this.commerceService.deleteCommerce(id);
   }
 
-  onAddCity(newCity: City): void {
-    this.citiesService.addCity(newCity).subscribe();
+  onAddLocation(newLocation: LocationRequestEntitie): void {  // Cambiado a LocationRequestEntitie
+    this.locationsService.addLocation(newLocation).subscribe(data => {
+      this.locationsList.push(data); // Añadir la respuesta (LocationResponseEntitie) a locationsList
+    });
   }
 
 }
