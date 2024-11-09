@@ -45,9 +45,9 @@ export class OilFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.viscositiesService.viscosities$.subscribe(data => {
-      this.viscositiesList = data;
-    });
+    // this.viscositiesService.viscosities$.subscribe(data => {
+    //   this.viscositiesList = data;
+    // });
   }
 
   filteredViscosities(): Viscosity[] {

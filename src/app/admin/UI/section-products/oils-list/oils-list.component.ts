@@ -33,15 +33,12 @@ export class OilsListComponent implements OnInit {
   searchTerm: string = '';
   viscositiesMap: { [id: string]: string } = {};
 
-  constructor(private viscositiesService: ViscositiesService) { }
+  constructor(
+    private viscositiesService: ViscositiesService
+  ) { }
 
   ngOnInit(): void {
-    this.viscositiesService.viscosities$.subscribe((viscosities: Viscosity[]) => {
-      this.viscositiesMap = viscosities.reduce((acc, viscosity) => {
-        acc[viscosity.id] = viscosity.description;
-        return acc;
-      }, {} as { [id: string]: string });
-    });
+    
   }
 
   getViscosityNames(oil: Oil): string {

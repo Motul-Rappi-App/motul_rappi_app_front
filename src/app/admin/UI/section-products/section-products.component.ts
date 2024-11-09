@@ -7,6 +7,7 @@ import { OilsService } from '../../services/oils.service';
 import { ViscositiesService } from '../../services/viscosities.service';
 import { OilFormComponent } from './oil-form/oil-form.component';
 import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.component';
+import { ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core/models';
 
 @Component({
   selector: 'app-section-products',
@@ -18,7 +19,7 @@ import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.co
 export class SectionProductsComponent implements OnInit {
 
   oilsList: Oil[] = [];
-  viscositiesList: Viscosity[] = [];
+  viscositiesList: ViscosityResponseEntitie[] = [];
   selectedOil: Oil | null = null;
 
   constructor(
@@ -32,7 +33,9 @@ export class SectionProductsComponent implements OnInit {
       this.oilsList = data;
     })
 
-    this.viscositiesService.loadViscositiesFromDb();
+    this.viscositiesService.getViscosities().subscribe(data => {
+      this.viscositiesList = data;
+    });
   }
 
   onAddOil(newOil: Oil): void {
@@ -52,7 +55,9 @@ export class SectionProductsComponent implements OnInit {
     this.oilsService.deleteOil(id);
   }
 
-  onAddViscosity(newViscosity: Viscosity): void {
-    this.viscositiesService.addViscosity(newViscosity).subscribe();
+  onAddViscosity(newViscosity: ViscosityRequestEntitie): void { 
+    this.viscositiesService.addViscosity(newViscosity).subscribe(data => {
+      this.viscositiesList.push(data);
+    });
   }
 }
