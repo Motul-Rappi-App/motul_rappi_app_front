@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { City } from '../../../models/city.model';
 import { CommonModule } from '@angular/common';
+import { LocationResponseEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-city-list',
@@ -11,20 +12,18 @@ import { CommonModule } from '@angular/common';
 })
 export class CityListComponent {
 
-  @Input() citiesList: City[] = [];
-  @Output() addCity = new EventEmitter<void>();
+  @Input() locationsList: LocationResponseEntitie[] = [];
+  @Output() addLocation = new EventEmitter<void>();
 
   searchTerm: string = '';
 
-  onAddCity(): void {
-    this.addCity.emit();
+  onAddLocation(): void {
+    this.addLocation.emit();
   }
 
-  getFilteredCities(): City[] {
-    return this.citiesList.filter(city =>
-      city.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+  getFilteredLocations(): LocationResponseEntitie[] {
+    return this.locationsList.filter(location =>
+      location.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
-
-
 }

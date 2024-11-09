@@ -14,11 +14,12 @@
     </section>
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg mt-2">
-      <app-city-list [citiesList]="citiesList"></app-city-list>
+      <app-city-list [locationsList]="locationsList"></app-city-list>
     </section>
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg mt-2">
-      <app-city-form (addCity)="onAddCity($event)"></app-city-form>
+      <app-city-form (addLocation)="onAddLocation($event)"></app-city-form>
     </section>
+
   </div>
 </div>
