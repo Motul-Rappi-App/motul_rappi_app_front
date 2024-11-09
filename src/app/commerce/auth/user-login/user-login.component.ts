@@ -48,7 +48,6 @@ export class UserLoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid && this.captchaResolved) {
-      // console.log('Formulario válido:', this.loginForm.value);
       this._toast.success('Bienvenido', 'Ingreso exitoso', {
         timeOut: 3000,
         progressBar: true,
@@ -59,15 +58,10 @@ export class UserLoginComponent {
         timeOut: 3000,
         progressBar: true,
       });
-      // console.log('Formulario inválido');
     }
   }
 
-  get email() {
-    return this.loginForm.get('email');
-  }
-
-  get password() {
-    return this.loginForm.get('password');
-  }
+  get email() {return this.loginForm.get('email');}
+  get password() {return this.loginForm.get('password');}
+  
 }
