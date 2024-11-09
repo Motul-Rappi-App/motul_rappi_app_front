@@ -28,9 +28,9 @@ export class UserLoginComponent {
   constructor(
     private fb: FormBuilder,
     private _toast: ToastrService,
-     private router: Router,
-     private jwtServ: JwtLocalManageService,
-     private authServ: AuthService
+    private router: Router,
+    private jwtServ: JwtLocalManageService,
+    private authServ: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -51,7 +51,6 @@ export class UserLoginComponent {
   }
 
   onSubmit() {
-
     if (this.validateIsFormInvalid) {
       this.invalidForm();
       return;
@@ -97,4 +96,5 @@ export class UserLoginComponent {
 
   get email() { return this.loginForm.get('email') }
   get password() { return this.loginForm.get('password') }
+
 }
