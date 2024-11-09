@@ -81,19 +81,20 @@ export class UserLoginComponent {
   }
 
   successLogin(data: AuthenticationResponseEntitie){
-     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
-      this.jwtServ.setTokenToLocal(data.token);
-      this.router.navigate(['/admin/lobby']);
+    this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+    this.jwtServ.setTokenToLocal(data.token);
+    this.router.navigate(['/admin/lobby']);
   }
 
   invalidForm(){
     this._toast.error('Formulario inválido', 'Por favor complete los campos de forma correcta', environment.TOAST_CONFIG);
   }
 
-  get validateIsFormInvalid() {
-    return !this.loginForm.valid && !this.captchaResolved;
+  goToForgotPassword(){
+    this.router.navigate(['/commerce/forgot-password']);
   }
 
+  get validateIsFormInvalid() { return !this.loginForm.valid && !this.captchaResolved }
   get email() { return this.loginForm.get('email') }
   get password() { return this.loginForm.get('password') }
 
