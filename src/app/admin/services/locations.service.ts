@@ -41,7 +41,7 @@ export class LocationsService {
   addLocation(location: LocationRequestEntitie): Observable<LocationResponseEntitie> {
     const headers = this.getAuthHeaders();
     return this.http.post<LocationResponseEntitie>(this.base_back_url, location, { headers });
-  }
+  }  
 
   updateLocation(location: LocationUpdateRequestEntitie): Observable<LocationResponseEntitie> {
     const headers = this.getAuthHeaders();

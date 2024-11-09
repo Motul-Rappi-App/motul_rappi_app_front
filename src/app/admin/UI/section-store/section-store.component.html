@@ -2,7 +2,6 @@
   <h1 class="text-3xl font-bold text-gray-200 mb-6">Administrar Ciudades y Comercios</h1>
   <div class="grid grid-cols-1 md:grid-cols-6 gap-8">
 
-
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg">
       <app-commerce-list [commerceList]="commerceList" (editCommerce)="onEditCommerce($event)"
         (deleteCommerce)="onDeleteCommerce($event)"></app-commerce-list>
