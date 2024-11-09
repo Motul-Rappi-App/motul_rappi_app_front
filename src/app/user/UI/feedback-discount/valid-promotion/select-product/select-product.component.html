@@ -1,0 +1,75 @@
+<div class="flex flex-col items-center justify-center p-1 rounded-lg">
+  <h1 class="text-2xl font-bold text-green-500 mb-4 mt-6">Seleccionar producto</h1>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="w-full max-w-lg space-y-4">
+    <!-- Referencias Selector -->
+    <div>
+      <label for="referencia" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Referencia
+      </label>
+      <select
+        id="referencia"
+        formControlName="referencia"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        (change)="onReferenciaChange()">
+
+        <option value="" disabled selected>Seleccione una referencia</option>
+        <option *ngFor="let reference of products" [value]="reference.id">{{ reference.name }}</option>
+
+      </select>
+      <p *ngIf="referencia?.invalid && (referencia?.dirty || referencia?.touched)" class="text-red-500 text-sm mt-1">
+        La referencia es obligatoria.
+      </p>
+    </div>
+
+    <!-- Viscosidad Selector -->
+    <div *ngIf="referencia?.value">
+      <label for="viscosidad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Seleccionar viscosidad
+      </label>
+      <select
+        id="viscosidad"
+        formControlName="viscosidad"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione una viscosidad</option>
+        <option *ngFor="let viscosidad of viscosities" [value]="viscosidad.id">{{ viscosidad.description }}</option>
+      </select>
+      <p *ngIf="viscosidad?.invalid && (viscosidad?.dirty || viscosidad?.touched)" class="text-red-500 text-sm mt-1">
+        La viscosidad es obligatoria.
+      </p>
+    </div>
+
+    <!-- Cantidad de Litros Selector -->
+    <div *ngIf="viscosidad?.value">
+      <label for="litros" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Cantidad de Litros
+      </label>
+      <select
+        id="litros"
+        formControlName="litros"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione cantidad de litros</option>
+        <option value="1">1 Litro</option>
+        <option value="2">2 Litros</option>
+      </select>
+      <p *ngIf="litros?.invalid && (litros?.dirty || litros?.touched)" class="text-red-500 text-sm mt-1">
+        La cantidad de litros es obligatoria.
+      </p>
+    </div>
+
+
+    <button type="submit" [ngClass]="{
+        'bg-green-700 hover:bg-green-800': productForm.valid,
+        'bg-gray-700 cursor-not-allowed': productForm.invalid
+      }" 
+      class="text-white font-semibold py-2 px-4 rounded-lg w-full" 
+      [disabled]="productForm.invalid"
+      *ngIf="productForm.valid">
+      Seleccionar Producto
+    </button>
+
+  </form>
+
+</div>
