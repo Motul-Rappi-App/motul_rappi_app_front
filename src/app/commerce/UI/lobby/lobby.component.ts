@@ -16,11 +16,11 @@ export class LobbyComponent {
 
   goToRedeem() {
     console.log('Sección Redimir');  
-    this.router.navigate(['/sellers/reedem']);
+    this.router.navigate(['/commerce/reedem']);
   }
 
   goToRegister() {
     console.log('Sección Inscribir');  
-    this.router.navigate(['/sellers/registerrt']);
+    this.router.navigate(['/commerce/registerrt']);
   }
 }

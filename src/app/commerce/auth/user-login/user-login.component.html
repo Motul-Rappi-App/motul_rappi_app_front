@@ -44,7 +44,7 @@
         <re-captcha (resolved)="resolved($event)" [siteKey]="recaptchaSiteKey"></re-captcha>
       </div>    
 
-      <a  href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+      <a  (click)="goToForgotPassword()" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500 cursor-pointer">
         ¿Olvidaste tu contraseña?
       </a>
 
@@ -60,5 +60,7 @@
     </button>
     
   </form>
+  <!-- Spinner -->
+  <app-spinner *ngIf="isLoading"></app-spinner>
 </app-forms-container>
       

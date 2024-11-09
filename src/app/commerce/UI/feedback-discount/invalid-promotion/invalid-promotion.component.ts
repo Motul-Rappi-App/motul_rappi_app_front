@@ -18,7 +18,7 @@ export class InvalidPromotionComponent {
 
   public goToRedeem() {
     console.log('Redirigiendo a la página de redención');
-    this.router.navigate(['/sellers/lobby']);
+    this.router.navigate(['/commerce/lobby']);
   }
 
 }

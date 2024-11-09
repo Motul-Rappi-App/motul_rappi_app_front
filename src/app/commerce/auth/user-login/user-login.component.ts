@@ -9,12 +9,13 @@ import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.s
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
 import { environment } from '../../../../environments/environment.development';
+import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
 
 
 @Component({
   selector: 'app-user-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent],
+  imports: [ReactiveFormsModule, CommonModule, RecaptchaModule, FormsContainerComponent, SpinnerComponent],
   templateUrl: './user-login.component.html',
   styleUrls: ['./user-login.component.css']
 })
@@ -23,7 +24,7 @@ export class UserLoginComponent {
   loginForm: FormGroup;
   captchaResolved: boolean = false;
   recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
-
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -55,7 +56,7 @@ export class UserLoginComponent {
       this.invalidForm();
       return;
     }
-
+    this.isLoading = true;
     this.sendFormToValidateCredentials();
   }
 
@@ -67,9 +68,11 @@ export class UserLoginComponent {
 
     this.authServ.login(authRequest)!.subscribe({
       next: (data) => {
+        this.isLoading = false;
         this.successLogin(data);
       },
       error: (err) => {
+        this.isLoading = false;
         console.log(err)
         this.noSuccessLogin(err.error);
         }
@@ -81,19 +84,20 @@ export class UserLoginComponent {
   }
 
   successLogin(data: AuthenticationResponseEntitie){
-     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
-      this.jwtServ.setTokenToLocal(data.token);
-      this.router.navigate(['/admin/lobby']);
+    this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+    this.jwtServ.setTokenToLocal(data.token);
+    this.router.navigate(['/commerce/lobby']);
   }
 
   invalidForm(){
     this._toast.error('Formulario inválido', 'Por favor complete los campos de forma correcta', environment.TOAST_CONFIG);
   }
 
-  get validateIsFormInvalid() {
-    return !this.loginForm.valid && !this.captchaResolved;
+  goToForgotPassword(){
+    this.router.navigate(['/commerce/forgot-password']);
   }
 
+  get validateIsFormInvalid() { return !this.loginForm.valid && !this.captchaResolved }
   get email() { return this.loginForm.get('email') }
   get password() { return this.loginForm.get('password') }
 
