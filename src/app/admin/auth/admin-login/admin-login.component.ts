@@ -66,16 +66,15 @@ export class AdminLoginComponent {
     this.authServ.login(authRequest)!.subscribe({
       next: (data) => {
         this.successLogin(data);
-      },
-      error: (err) => {
+      },error: (err) => {
         console.log(err)
         this.noSuccessLogin(err.error);
-        }
-      }) 
+      }}) 
   }
 
   noSuccessLogin(error: string){
     this._toast.error('Error iniciando sesión', error, environment.TOAST_CONFIG);
+    console.log("Error: ",error)
   }
 
   successLogin(data: AuthenticationResponseEntitie){

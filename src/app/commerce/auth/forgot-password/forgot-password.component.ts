@@ -18,6 +18,7 @@ export class ForgotPasswordComponent {
   recaptchaResolved: boolean = false;
   recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED';
   showSuccessModal: boolean = false;
+  isLoading: boolean = true;
 
   constructor(
     private fb: FormBuilder,
