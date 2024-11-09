@@ -44,6 +44,7 @@ export class AdminLoginComponent implements OnInit {
 
   verifyIfLoggedIn(): void {
     this.isLoading = true;
+    
     this.authServ.checkIfLoggedIn().subscribe(isLoggedIn => {
       this.isLoading = false;
       if (isLoggedIn) {

@@ -32,9 +32,7 @@ export class SectionProductsComponent implements OnInit {
       this.oilsList = data;
     })
 
-    this.viscositiesService.viscosities$.subscribe(data => {
-      this.viscositiesList = data;
-    });
+    this.viscositiesService.loadViscositiesFromDb();
   }
 
   onAddOil(newOil: Oil): void {
