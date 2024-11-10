@@ -3,17 +3,19 @@ import { ToastrService } from "ngx-toastr";
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
+import { SpinnerComponent } from "../../../../../shared/spinner/spinner.component";
 
 @Component({
   selector: 'app-select-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent],
   templateUrl: './select-product.component.html',
   styleUrls: ['./select-product.component.css']
 })
 export class SelectProductComponent implements OnInit {
 
   productForm: FormGroup;
+  isLoading: boolean = false;
 
   // Simulación de datos
   products = [
@@ -60,7 +62,9 @@ export class SelectProductComponent implements OnInit {
   }
 
   onSubmit() {
+    this.isLoading = true;
     if (this.productForm.valid) {
+      this.isLoading = false;
       this._toast.success('Formulario enviado con éxito', 'Producto Seleccionado', { 
         timeOut: 3000,
         progressBar: true,
@@ -68,6 +72,7 @@ export class SelectProductComponent implements OnInit {
 
       console.log('Formulario válido:', this.productForm.value);
     } else {
+      this.isLoading = false;
       this._toast.error('Formulario inválido', 'Error al enviar', {
         timeOut: 3000,
         progressBar: true,

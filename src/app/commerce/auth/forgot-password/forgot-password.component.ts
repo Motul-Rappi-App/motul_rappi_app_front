@@ -3,11 +3,12 @@ import { FormsContainerComponent } from '../../../layouts/forms-container/forms-
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RecaptchaModule } from 'ng-recaptcha';
+import { ModalComponent } from './modal/modal.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [FormsContainerComponent, RecaptchaModule, CommonModule, ReactiveFormsModule],
+  imports: [FormsContainerComponent, RecaptchaModule, CommonModule, ReactiveFormsModule, ModalComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css'
 })
@@ -17,6 +18,7 @@ export class ForgotPasswordComponent {
   recaptchaResolved: boolean = false;
   recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED';
   showSuccessModal: boolean = false;
+  isLoading: boolean = true;
 
   constructor(
     private fb: FormBuilder,
@@ -50,4 +52,3 @@ export class ForgotPasswordComponent {
     this.showSuccessModal = false;
   }
 }
-

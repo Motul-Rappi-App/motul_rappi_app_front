@@ -35,6 +35,8 @@
         <p *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-sm mt-1">
           <span *ngIf="password?.errors?.['required']">La contraseña es requerida.</span>
           <span *ngIf="password?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
+          <span *ngIf="password?.errors?.['maxlength']">La contraseña no debe superar los 9 caracteres.</span>
+          <span *ngIf="password?.errors?.['pattern']">La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y no debe tener espacios.</span>
         </p>
       </div>
   
@@ -57,5 +59,7 @@
         Iniciar sesión
       </button>
     </form>
-  </app-forms-container>
+  <!-- Spinner -->
+  <app-spinner *ngIf="isLoading"></app-spinner>
+</app-forms-container>
         

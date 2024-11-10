@@ -1,0 +1,17 @@
+<div class="bg-gray-900 p-4 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-100">Lista de Ubicaciones</h2>
+    </div>
+
+    <ul *ngIf="getFilteredLocations().length > 0; else noLocations" class="space-y-2">
+        <li *ngFor="let location of getFilteredLocations()" class="mb-2 border-b border-gray-700 pb-2">
+            <div class="text-gray-300 font-bold">{{ location.name }}</div>
+        </li>
+    </ul>
+
+    <ng-template #noLocations>
+        <div class="text-center text-gray-400 py-4">
+            No hay ubicaciones disponibles.
+        </div>
+    </ng-template>
+</div>
