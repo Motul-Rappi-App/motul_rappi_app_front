@@ -3,8 +3,8 @@
         <h2 class="text-xl font-semibold text-gray-100">Lista de Ubicaciones</h2>
     </div>
 
-    <ul *ngIf="locationsList.length > 0; else noLocations" class="space-y-2">
-        <li *ngFor="let location of locationsList" class="mb-2 border-b border-gray-700 pb-2">
+    <ul *ngIf="getFilteredLocations().length > 0; else noLocations" class="space-y-2">
+        <li *ngFor="let location of getFilteredLocations()" class="mb-2 border-b border-gray-700 pb-2">
             <div class="text-gray-300 font-bold">{{ location.name }}</div>
         </li>
     </ul>

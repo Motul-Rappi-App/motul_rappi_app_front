@@ -3,23 +3,40 @@
 
     <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
 
+        <!-- Campo para el Nombre de Ubicación -->
         <div class="mb-4">
             <label class="block text-gray-400 mb-1">Nombre de Ubicación</label>
             <input type="text" formControlName="name"
                 class="w-full p-2 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:border-blue-500"
                 placeholder="Ingresa el nombre de la ubicación">
 
+            <!-- Mensajes de error para el campo 'name' -->
             <div *ngIf="locationForm.get('name')?.invalid && locationForm.get('name')?.touched"
                 class="text-red-500 mt-1 text-sm">
                 <span *ngIf="locationForm.get('name')?.errors?.['required']">
                     El nombre de la ubicación no puede estar vacío.
                 </span>
+                <span *ngIf="locationForm.get('name')?.errors?.['minlength']">
+                    El nombre de la ubicación debe tener al menos 4 caracteres.
+                </span>
+                <span *ngIf="locationForm.get('name')?.errors?.['maxlength']">
+                    El nombre de la ubicación no puede exceder los 50 caracteres.
+                </span>
                 <span *ngIf="locationForm.get('name')?.errors?.['pattern']">
-                    El nombre de la ubicación debe incluir al menos una mayúscula, y solo puede contener letras.
+                    El nombre de la ubicación debe incluir al menos una mayúscula y solo puede contener letras.
                 </span>
             </div>
         </div>
 
+        <!-- Mensaje de error para el ID del Administrador -->
+        <div *ngIf="locationForm.get('adminId')?.invalid && locationForm.get('adminId')?.touched"
+            class="text-red-500 mt-1 text-sm">
+            <span *ngIf="locationForm.get('adminId')?.errors?.['required']">
+                El administrador de la ubicación no puede ser nulo.
+            </span>
+        </div>
+
+        <!-- Botón para añadir ubicación -->
         <button type="submit" [ngClass]="{
           'bg-green-700 hover:bg-green-800': locationForm.valid,
           'bg-gray-700 cursor-not-allowed': locationForm.invalid

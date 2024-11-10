@@ -53,9 +53,9 @@ export class SectionStoreComponent implements OnInit {
     this.commerceService.deleteCommerce(id);
   }
 
-  onAddLocation(newLocation: LocationRequestEntitie): void {  // Cambiado a LocationRequestEntitie
+  onAddLocation(newLocation: LocationRequestEntitie): void {
     this.locationsService.addLocation(newLocation).subscribe(data => {
-      this.locationsList.push(data); // Añadir la respuesta (LocationResponseEntitie) a locationsList
+      this.locationsList.push(data); // Añade la nueva ubicación recibida del backend a la lista
     });
   }
 

@@ -2,27 +2,29 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LocationRequestEntitie } from '../../../../core/models';
+import { JwtLocalManageService } from '../../../../core/services/jwt-local-manage.service';
 
 @Component({
   selector: 'app-city-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './city-form.component.html',
-  styleUrl: './city-form.component.css'
+  styleUrls: ['./city-form.component.css']
 })
-export class CityFormComponent {
+export class CityFormComponent implements OnInit {
 
   @Output() addLocation = new EventEmitter<LocationRequestEntitie>();
-
   locationForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private jwtService: JwtLocalManageService) {
     this.locationForm = this.fb.group({
       name: [
         '',
         [
           Validators.required,
-          Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú]{4,50}$/) // Debe contener al menos una mayúscula y solo letras
+          Validators.minLength(4),
+          Validators.maxLength(50),
+          Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú]+$/) // Al menos una mayúscula, solo letras
         ]
       ],
       adminId: [
@@ -32,18 +34,41 @@ export class CityFormComponent {
     });
   }
 
-  private generateAdminId(): number {
-    return Math.floor(Math.random() * 100) + 1; // Genera un ID entre 1 y 100
+  ngOnInit(): void {
+    const adminId = this.getAdminIdFromToken();
+    if (adminId) {
+      this.locationForm.patchValue({ adminId });
+      console.log("Admin ID asignado:", adminId);
+    } else {
+      console.warn("Admin ID no encontrado en el token.");
+    }
+  }
+
+  private getAdminIdFromToken(): number | null {
+    const token = this.jwtService.tokenFromLocal?.token;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload completo:', payload);
+        return payload.id || null;
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        return null;
+      }
+    }
+    console.warn("Token no encontrado en localStorage.");
+    return null;
   }
 
   onSubmit(): void {
     if (this.locationForm.valid) {
-      const newLocation: LocationRequestEntitie = {
-        name: this.locationForm.value.name,
-        adminId: this.generateAdminId() 
-      };
+      const newLocation: LocationRequestEntitie = this.locationForm.value;
+
+      console.log('Datos enviados:', JSON.stringify(newLocation, null, 2));
       this.addLocation.emit(newLocation);
       this.locationForm.reset();
+    } else {
+      console.log('Formulario inválido', this.locationForm);
     }
   }
 }
