@@ -3,6 +3,7 @@ import { Viscosity } from '../../../models/viscosity.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ViscosityResponseEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-viscosities-list',
@@ -23,7 +24,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ],
 })
 export class ViscositiesListComponent {
-  @Input() viscositiesList: Viscosity[] = [];
+  @Input() viscositiesList: ViscosityResponseEntitie[] = [];
   @Output() addViscosity = new EventEmitter<void>();
 
   searchTerm: string = '';
@@ -32,9 +33,10 @@ export class ViscositiesListComponent {
     this.addViscosity.emit();
   }
 
-  getFilteredViscosities(): Viscosity[] {
+  getFilteredViscosities(): ViscosityResponseEntitie[] {
     return this.viscositiesList.filter(viscosity =>
       viscosity.description.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
+
 }

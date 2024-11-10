@@ -12,7 +12,7 @@
   <ul *ngIf="getFilteredViscosities().length > 0; else noViscosities">
     <li *ngFor="let viscosity of getFilteredViscosities()" class="mb-2 border-b border-gray-700 pb-2" @listAnimation>
       <div class="text-gray-300 font-bold">{{ viscosity.description }}</div>
-      <div class="text-gray-400 text-sm">Admin ID: {{ viscosity.idAdmin }}</div>
+      <div class="text-gray-400 text-sm">Admin ID: {{ viscosity.admin.id }}</div>
     </li>
   </ul>
 
