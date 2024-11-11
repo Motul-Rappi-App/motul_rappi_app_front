@@ -48,7 +48,7 @@ export class UserLoginComponent {
     }
 
     this.captchaResolved = true;
-    console.log(`Resolved captcha with response: ${captchaResponse}`);
+    // console.log(`Resolved captcha with response: ${captchaResponse}`);
   }
 
   onSubmit() {
@@ -74,13 +74,21 @@ export class UserLoginComponent {
       error: (err) => {
         this.isLoading = false;
         console.log(err)
-        this.noSuccessLogin(err.error);
+        this.noSuccessLogin(err.error.error);
         }
       }) 
   }
 
+  validateErrorMessage(err: string){
+    if(err === "Bad credentials") return "Correo o Contraseña incorrecto";
+    else return null
+  }
+
   noSuccessLogin(error: string){
-    this._toast.error('Error iniciando sesión', error, environment.TOAST_CONFIG);
+    
+    let errorToShow = this.validateErrorMessage(error);
+    if(!errorToShow) errorToShow = error;
+    this._toast.error('Error iniciando sesión', errorToShow, environment.TOAST_CONFIG);
   }
 
   successLogin(data: AuthenticationResponseEntitie){
