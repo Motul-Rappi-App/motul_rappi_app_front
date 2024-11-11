@@ -76,6 +76,7 @@ export class SectionStoreComponent implements OnInit {
   onUpdateCommerce(updatedCommerce: CommerceUpdateRequestEntitie): void {
     this.commerceService.updateCommerce(updatedCommerce).subscribe(() => {
       this.loadCommerces();
+      this.loadLocations();
       this.selectedCommerce = null;
     });
   }

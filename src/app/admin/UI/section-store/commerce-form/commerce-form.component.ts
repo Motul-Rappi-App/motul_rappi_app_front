@@ -14,7 +14,7 @@ import { LocationsService } from '../../../services/locations.service';
 })
 export class CommerceFormComponent {
 
-  @Input() locationsList: LocationResponseEntitie[] = []; 
+  @Input() locationsList: LocationResponseEntitie[] = [];
   @Input() selectedCommerce: CommerceUpdateRequestEntitie | null = null;
   @Output() addCommerce = new EventEmitter<CommerceRequestEntitie>();
   @Output() updateCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
@@ -68,10 +68,15 @@ export class CommerceFormComponent {
   ngOnChanges(): void {
     if (this.selectedCommerce) {
       this.commerceForm.patchValue(this.selectedCommerce);
+      // Deshabilita el campo de correo si se está editando
+      this.commerceForm.get('email')?.disable();
     } else {
       this.commerceForm.reset();
+      // Habilita el campo de correo si se está añadiendo un nuevo comercio
+      this.commerceForm.get('email')?.enable();
     }
   }
+
 
   loadLocations(): void {
     this.locationsService.getLocations().subscribe(data => {
