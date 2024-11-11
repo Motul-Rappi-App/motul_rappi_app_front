@@ -1,9 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Commerce } from '../../../models/commerce.model';
-import { CitiesService } from '../../../services/cities.service';
-import { City } from '../../../models/city.model';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommerceResponseEntitie, CommerceUpdateRequestEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-commerce-list',
@@ -12,37 +10,39 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './commerce-list.component.html',
   styleUrl: './commerce-list.component.css'
 })
-export class CommerceListComponent implements OnInit {
+export class CommerceListComponent {
 
-  @Input() commerceList: Commerce[] = [];
-  @Output() editCommerce = new EventEmitter<Commerce>();
-  @Output() deleteCommerce = new EventEmitter<string>();
+  @Input() commerceList: CommerceResponseEntitie[] = [];
+  @Output() editCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
+  @Output() deleteCommerce = new EventEmitter<number>();
 
   searchTerm: string = '';
-  citiesMap: { [id: string]: string } = {};
 
-  constructor(private citiesService: CitiesService) { }
-
-  ngOnInit(): void {
-    this.citiesService.cities$.subscribe((cities: City[]) => {
-      this.citiesMap = cities.reduce((acc, city) => {
-        acc[city.id] = city.name;
-        return acc;
-      }, {} as { [id: string]: string });
-    });
-  }
-
-  getFilteredCommerces(): Commerce[] {
+  getFilteredCommerces(): CommerceResponseEntitie[] {
     return this.commerceList.filter(commerce =>
       commerce.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
-  onEdit(commmerce: Commerce): void {
-    this.editCommerce.emit(commmerce);
+  onEdit(commerce: CommerceResponseEntitie): void {
+    if (commerce.location && commerce.location.id) {
+      const commerceUpdateRequest: CommerceUpdateRequestEntitie = {
+        id: commerce.id,
+        nit: commerce.nit,
+        email: commerce.email,
+        password: commerce.password,
+        name: commerce.name,
+        locationId: commerce.location.id,
+      };
+      this.editCommerce.emit(commerceUpdateRequest);
+      
+    } else {
+      console.error("El location o location.id es undefined");
+    }
   }
-
-  onDelete(id: string): void {
+  
+  onDelete(id: number): void {
     this.deleteCommerce.emit(id);
   }
+
 }

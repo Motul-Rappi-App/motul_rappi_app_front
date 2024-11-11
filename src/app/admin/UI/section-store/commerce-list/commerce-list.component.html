@@ -13,7 +13,7 @@
                 <th class="px-4 py-2 text-left">NIT</th>
                 <th class="px-4 py-2 text-left">Correo Electrónico</th>
                 <th class="px-4 py-2 text-left">Ciudad</th>
-                <th class="px-4 py-2 text-left">Fecha</th>
+                <th class="px-4 py-2 text-left">Fecha de Inscripción</th>
                 <th class="px-4 py-2 text-left">Acciones</th>
             </tr>
         </thead>
@@ -22,8 +22,10 @@
                 <td class="px-4 py-2 text-gray-300">{{ commerce.name }}</td>
                 <td class="px-4 py-2 text-gray-300">{{ commerce.nit }}</td>
                 <td class="px-4 py-2 text-gray-300">{{ commerce.email }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ citiesMap[commerce.idCity] || 'N/A' }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ commerce.date }}</td>
+                <td class="px-4 py-2 text-gray-300">{{ commerce.location.name || 'N/A' }}</td>
+
+                <!-- Acceso actualizado -->
+                <td class="px-4 py-2 text-gray-300">{{ commerce.inscriptionDate | date: 'MMMM d, y' }}</td>
                 <td class="px-4 py-2">
                     <div class="flex gap-2">
                         <button (click)="onEdit(commerce)"

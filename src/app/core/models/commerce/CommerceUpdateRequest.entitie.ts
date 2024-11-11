@@ -1,8 +1,8 @@
-export interface CommerceUpdateRequestEntitie{
+export interface CommerceUpdateRequestEntitie {
     id: number;
-    NIT: string;
+    nit: string;
     email: string;
     password: string;
     name: string;
-    locationId: number;
+    locationId: number; 
 }

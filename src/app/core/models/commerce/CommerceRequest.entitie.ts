@@ -1,5 +1,5 @@
 export interface CommerceRequestEntitie{
-    NIT: string;
+    nit: string;
     email: string;
     password: string;
     name: string;

@@ -1,58 +1,79 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Commerce } from '../models/commerce.model';
+import { BehaviorSubject, map, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment.development';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { JwtLocalManageService } from '../../core/services/jwt-local-manage.service';
+import { CommerceRequestEntitie, CommerceResponseEntitie, CommerceUpdateRequestEntitie } from '../../core/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommerceService {
-  private localStorageKey = 'commerces';
 
-  private commercesSubject = new BehaviorSubject<Commerce[]>(this.loadCommercesFromStorage());
-  commerces$ = this.commercesSubject.asObservable();
+  private base_back_url: string = `${environment.BACKEND_BASE_URL}commerce`;
 
-  constructor() { }
+  constructor(
+    private http: HttpClient,
+    private jwtService: JwtLocalManageService
+  ) { }
 
-  private loadCommercesFromStorage(): Commerce[] {
-    return JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
-  }
-
-  getCommerces(): Observable<Commerce[]> {
-    return this.commerces$;
-  }
-
-  getCommerceById(id: string): Observable<Commerce | undefined> {
-    const commerces = this.commercesSubject.getValue();
-    const commerce = commerces.find((c: Commerce) => c.id === id);
-    return of(commerce);
-  }
-
-  addCommerce(commerce: Commerce): Observable<Commerce> {
-    const currentCommerces = this.commercesSubject.getValue();
-    const updatedCommerces = [...currentCommerces, commerce];
-
-    this.commercesSubject.next(updatedCommerces);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(updatedCommerces));
-
-    return of(commerce);
-  }
-
-  updateCommerce(id: string, updatedCommerce: Commerce): void {
-    const currentCommerces = this.commercesSubject.getValue();
-    const index = currentCommerces.findIndex((c: Commerce) => c.id === id);
-
-    if (index > -1) {
-      currentCommerces[index] = updatedCommerce;
-      this.commercesSubject.next([...currentCommerces]);
-      localStorage.setItem(this.localStorageKey, JSON.stringify(currentCommerces));
+  private getAuthHeaders(): HttpHeaders {
+    const headers = this.jwtService.tokenInHeaders;
+    if (!headers) {
+      throw new Error('Authorization headers not found');
     }
+    return headers;
   }
 
-  deleteCommerce(id: string): void {
-    const currentCommerces = this.commercesSubject.getValue();
-    const updatedCommerces = currentCommerces.filter(commerce => commerce.id !== id);
+  getCommerces(): Observable<CommerceResponseEntitie[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<{ content: CommerceResponseEntitie[] }>(this.base_back_url, { headers })
+      .pipe(
+        map(response => response.content),
+        catchError(error => {
+          return throwError(() => new Error('Error al obtener comercios'));
+        })
+      );
+  }
 
-    this.commercesSubject.next(updatedCommerces);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(updatedCommerces));
+  getCommerceById(id: string): Observable<CommerceResponseEntitie> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<CommerceResponseEntitie>(`${this.base_back_url}/${id}`, { headers })
+      .pipe(
+        catchError(error => {
+          return throwError(() => new Error(`Error al obtener comercio con ID ${id}`));
+        })
+      );
+  }
+
+  addCommerce(commerce: CommerceRequestEntitie): Observable<CommerceResponseEntitie> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<CommerceResponseEntitie>(this.base_back_url, commerce, { headers })
+      .pipe(
+        catchError(error => {
+          return throwError(() => error);  // Retorna el error directamente para manejarlo en el componente
+        })
+      );
+  }
+
+  updateCommerce(commerce: CommerceUpdateRequestEntitie): Observable<CommerceResponseEntitie> {
+    const headers = this.getAuthHeaders();
+    return this.http.put<CommerceResponseEntitie>(this.base_back_url, commerce, { headers })
+      .pipe(
+        catchError(error => {
+          return throwError(() => error);
+        })
+      );
+  }
+
+  deleteCommerce(id: number): Observable<void> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${this.base_back_url}/${id}`, { headers })
+      .pipe(
+        catchError(error => {
+          return throwError(() => new Error(`Error al eliminar comercio con ID ${id}`));
+        })
+      );
   }
 }

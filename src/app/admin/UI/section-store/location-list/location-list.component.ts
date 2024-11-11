@@ -1,16 +1,15 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { City } from '../../../models/city.model';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LocationResponseEntitie } from '../../../../core/models';
 
 @Component({
-  selector: 'app-city-list',
+  selector: 'app-location-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './city-list.component.html',
-  styleUrl: './city-list.component.css'
+  templateUrl: './location-list.component.html',
+  styleUrl: './location-list.component.css'
 })
-export class CityListComponent {
+export class LocationListComponent {
 
   @Input() locationsList: LocationResponseEntitie[] = [];
   @Output() addLocation = new EventEmitter<void>();

@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Commerce } from '../../../models/commerce.model';
-import { City } from '../../../models/city.model';
-import { CitiesService } from '../../../services/cities.service';
 import { CommonModule } from '@angular/common';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { CommerceRequestEntitie, CommerceResponseEntitie, CommerceUpdateRequestEntitie, LocationResponseEntitie } from '../../../../core/models';
+import { LocationsService } from '../../../services/locations.service';
+import { CommerceService } from '../../../services/commerce.service'; // Importa el servicio correctamente
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-commerce-form',
@@ -12,74 +13,64 @@ import { CommonModule } from '@angular/common';
   templateUrl: './commerce-form.component.html',
   styleUrl: './commerce-form.component.css'
 })
-export class CommerceFormComponent {
+export class CommerceFormComponent implements OnInit {
 
-  @Input() selectedCommerce: Commerce | null = null;
-  @Output() addCommerce = new EventEmitter<Commerce>();
-  @Output() updateCommerce = new EventEmitter<Commerce>();
+  @Input() selectedCommerce: CommerceResponseEntitie | null = null;
 
   commerceForm: FormGroup;
-  citiesList: City[] = [];
+  locationsList: LocationResponseEntitie[] = [];
   searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private citiesService: CitiesService
+    private locationsService: LocationsService,
+    private commerceService: CommerceService, // Asegúrate de tener el servicio disponible
+    private _toast: ToastrService,
   ) {
     this.commerceForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(50),
-          Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚ0-9 ]+$'),
-          this.noWhitespaceValidator,
-          this.noConsecutiveCharactersValidator,
-          this.noOnlyNumbersValidator,
-        ]
-      ],
-      cities: [[], Validators.required],
-      nit: ['', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(5), Validators.maxLength(20)]],
+      name: ['', [
+        Validators.required,
+        Validators.pattern('^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú0-9]{1,50}$'),
+        this.noWhitespaceValidator
+      ]],
+      locationId: [null, Validators.required],
+      nit: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{9,12}$'),
+        Validators.minLength(1),
+        Validators.maxLength(20)
+      ]],
       email: ['', [Validators.required, Validators.email]],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(20),
-          Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')
-        ]
-      ],
+      password: ['', [
+        Validators.required,
+        Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$')
+      ]]
     });
   }
 
   ngOnInit(): void {
-    this.citiesService.cities$.subscribe(data => {
-      this.citiesList = data;
+    this.locationsService.getLocations().subscribe(data => {
+      this.locationsList = data;
+
+      if (this.selectedCommerce) {
+        this.setFormValues(this.selectedCommerce);
+      }
     });
   }
 
-  filteredCities(): City[] {
-    return this.citiesList.filter(city =>
-      city.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedCommerce'] && this.selectedCommerce) {
+    if (changes['selectedCommerce'] && this.selectedCommerce && this.locationsList.length > 0) {
       this.setFormValues(this.selectedCommerce);
     }
   }
 
-  private setFormValues(commerce: Commerce): void {
+  private setFormValues(commerce: CommerceResponseEntitie): void {
     this.commerceForm.patchValue({
       name: commerce.name,
-      cities: commerce.idCity,
+      locationId: commerce.location ? commerce.location.id : null,
       nit: commerce.nit,
       email: commerce.email,
-      password: commerce.password,
-      date: commerce.date
+      password: commerce.password
     });
   }
 
@@ -90,39 +81,55 @@ export class CommerceFormComponent {
 
   onSubmit(): void {
     if (this.commerceForm.valid) {
-      const commerceData: Commerce = {
-        id: Math.random().toString(36).substring(2),
-        name: this.commerceForm.value.name,
-        idCity: this.commerceForm.value.cities,
-        nit: this.commerceForm.value.nit,
-        email: this.commerceForm.value.email,
-        password: this.commerceForm.value.password,
-        date: this.selectedCommerce ? this.selectedCommerce.date : new Date().toISOString().split('T')[0],
-        idAdmin: '1'
-      };
+      const commerceData = this.selectedCommerce
+        ? {
+          id: this.selectedCommerce.id,
+          ...this.commerceForm.value,
+          adminId: "1"
+        }
+        : {
+          ...this.commerceForm.value,
+          adminId: "1"
+        };
 
       if (this.selectedCommerce) {
-        this.updateCommerce.emit(commerceData);
+        this.commerceService.updateCommerce(commerceData as CommerceUpdateRequestEntitie).subscribe({
+          next: () => {
+            this._toast.success('Comercio actualizado exitosamente', 'Éxito');
+            this.resetForm();
+          },
+          error: (error) => this.handleServiceError(error)
+        });
       } else {
-        this.addCommerce.emit(commerceData);
+        this.commerceService.addCommerce(commerceData as CommerceRequestEntitie).subscribe({
+          next: () => {
+            this._toast.success('Comercio añadido exitosamente', 'Éxito');
+            this.resetForm();
+          },
+          error: (error) => this.handleServiceError(error)
+        });
       }
-
-      this.resetForm();
+    } else {
+      this._toast.error('Por favor, complete el formulario correctamente', 'Error');
     }
   }
+
+  private handleServiceError(error: any): void {
+    let errorMessage = 'Ocurrió un error al procesar la solicitud. Intenta nuevamente.';
+
+    // Verificamos si el mensaje de error específico está en error.error.error
+    if (error.error && error.error.error) {
+      // Captura el mensaje de error específico del backend
+      errorMessage = error.error.error;
+    }
+
+    this._toast.error(errorMessage, 'Error');
+  }
+
 
   noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
     const isWhitespace = (control.value || '').trim().length === 0;
     return isWhitespace ? { whitespace: true } : null;
-  }
-
-  noConsecutiveCharactersValidator(control: AbstractControl): ValidationErrors | null {
-    const regex = /(.)\1{2,}/;
-    return regex.test(control.value) ? { consecutiveCharacters: true } : null;
-  }
-
-  noOnlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
-    return /^[0-9]+$/.test(control.value) ? { onlyNumbers: true } : null;
   }
 
   get name() {

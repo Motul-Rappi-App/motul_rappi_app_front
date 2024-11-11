@@ -3,11 +3,11 @@ import { LocationResponseEntitie } from "../location";
 
 export interface CommerceResponseEntitie {
     id: number;
-    NIT: string;
+    nit: string;
     email: string;
     password: string;
     name: string;
-    locationId: LocationResponseEntitie;
-    adminId: AdminResponseEntitie;
+    location: LocationResponseEntitie;  // Cambiado de locationId a location
+    admin: AdminResponseEntitie;        // Cambiado de adminId a admin
     inscriptionDate: Date;
 }
