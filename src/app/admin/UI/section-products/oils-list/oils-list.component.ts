@@ -26,6 +26,7 @@ import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilRef
 export class OilsListComponent {
 
   @Input() oilsList: OilReferenceResponseEntitie[] = [];
+  @Output() addOil = new EventEmitter<void>();
   @Output() editOil = new EventEmitter<OilReferenceUpdateRequestEntitie>();
   @Output() deleteOil = new EventEmitter<number>();
 
@@ -55,6 +56,10 @@ export class OilsListComponent {
     } else {
       console.error("La viscosidad no existe!");
     }
+  }
+
+  onAddOil(): void {
+    this.addOil.emit();
   }
 
   onDelete(id: number): void {

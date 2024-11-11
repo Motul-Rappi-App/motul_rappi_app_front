@@ -53,7 +53,6 @@ export class OilFormComponent implements OnInit {
   ngOnInit(): void {
     this.viscositiesService.getViscosities().subscribe(data => {
       this.viscositiesList = data;
-
       if (this.selectedOil) {
         this.setFormValues(this.selectedOil);
       }
@@ -101,6 +100,7 @@ export class OilFormComponent implements OnInit {
         this.oilService.updateOil(oilData as OilReferenceUpdateRequestEntitie).subscribe({
           next: () => {
             this._toast.success('Aceite actualizado exitosamente', 'Éxito', environment.TOAST_CONFIG);
+            this.updateOil.emit(oilData);
             this.resetForm();
           },
           error: (error) => this.handleServiceError(error)
@@ -109,6 +109,8 @@ export class OilFormComponent implements OnInit {
         this.oilService.addOil(oilData as OilReferenceRequestEntitie).subscribe({
           next: () => {
             this._toast.success('Aceite añadido exitosamente', 'Éxito', environment.TOAST_CONFIG);
+            console.log("Añadimos el aceite", oilData);
+            this.addOil.emit(oilData);
             this.resetForm();
           },
           error: (error) => this.handleServiceError(error)

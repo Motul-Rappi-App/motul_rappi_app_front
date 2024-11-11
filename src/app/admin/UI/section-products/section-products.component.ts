@@ -38,12 +38,10 @@ export class SectionProductsComponent implements OnInit {
   }
 
   onAddOil(newOil: OilReferenceRequestEntitie): void {
-    this.oilsService.addOil(newOil).subscribe(() => {
-      this.oilsService.getOils().subscribe(data => {
-        this.oilsList = data;
-      });
+    this.oilsService.addOil(newOil).subscribe(data => {
+      this.oilsList = [...this.oilsList, data];
     });
-  }
+  }  
 
   onEditOil(oil: OilReferenceUpdateRequestEntitie): void {
     this.selectedOil = {
