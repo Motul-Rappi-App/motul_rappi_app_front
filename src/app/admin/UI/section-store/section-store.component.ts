@@ -18,7 +18,7 @@ export class SectionStoreComponent implements OnInit {
 
   locationsList: LocationResponseEntitie[] = [];
   commerceList: CommerceResponseEntitie[] = [];
-  selectedCommerce: CommerceResponseEntitie | null = null;
+  selectedCommerce: CommerceResponseEntitie | CommerceUpdateRequestEntitie | null = null;
 
   constructor(
     private locationsService: LocationsService,
@@ -26,44 +26,63 @@ export class SectionStoreComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.loadLocations()
+    this.loadCommerces();
+  }
+
+  loadLocations(): void {
     this.locationsService.getLocations().subscribe(data => {
       this.locationsList = data;
     });
+  }
 
-    this.commerceService.getCommerces().subscribe(data => {
-      this.commerceList = data;
+  loadCommerces(): void {
+    this.commerceService.getCommerces().subscribe((commerces: CommerceResponseEntitie[]) => {
+      // Convertimos `location` a `locationId` en cada comercio
+      this.commerceList = commerces.map((commerce: any) => ({
+        ...commerce,
+        locationId: commerce.location ? commerce.location.id : null, // Extrae solo el ID de `location`
+        locationName: commerce.location ? commerce.location.name : null // Extrae solo el nombre de `location`
+      }));
+      
     });
   }
 
   onAddCommerce(newCommerce: CommerceRequestEntitie): void {
-    this.commerceService.addCommerce(newCommerce).subscribe(() => {
-      this.commerceService.getCommerces().subscribe(data => {
-        this.commerceList = data;
-      });
-    });
+    this.commerceService.addCommerce(newCommerce).subscribe(data => {
+      this.commerceList = [...this.commerceList, data];
+      this.loadCommerces();
+      this.loadLocations();
+    })
   }
 
-  onEditCommerce(commerce: CommerceUpdateRequestEntitie): void {
-    this.selectedCommerce = {
-      ...this.selectedCommerce,
-      ...commerce
-    } as CommerceResponseEntitie;
+  onEditCommerce(commerce: CommerceResponseEntitie): void {
+    if ((commerce as any).location && (commerce as any).location.id) {
+      this.selectedCommerce = {
+        id: commerce.id,
+        nit: commerce.nit,
+        email: commerce.email,
+        password: commerce.password,
+        name: commerce.name,
+        locationId: (commerce as any).location.id // Extracción directa desde location
+      } as CommerceUpdateRequestEntitie;
+    } else {
+      console.error("Error: 'location' o 'location.id' no está definido en el objeto 'commerce'", commerce);
+    }
   }
+
+
 
   onUpdateCommerce(updatedCommerce: CommerceUpdateRequestEntitie): void {
     this.commerceService.updateCommerce(updatedCommerce).subscribe(() => {
-      this.commerceService.getCommerces().subscribe(data => {
-        this.commerceList = data;
-      });
+      this.loadCommerces();
       this.selectedCommerce = null;
     });
   }
 
   onDeleteCommerce(id: number): void {
     this.commerceService.deleteCommerce(id).subscribe(() => {
-      this.commerceService.getCommerces().subscribe(data => {
-        this.commerceList = data;
-      });
+      this.loadCommerces();
     });
   }
 
@@ -73,4 +92,22 @@ export class SectionStoreComponent implements OnInit {
     });
   }
 
+  onLocationAdded(): void {
+    this.loadLocations();
+  }
+
+  get selectedCommerceForForm(): CommerceUpdateRequestEntitie | null {
+    if (this.selectedCommerce && 'locationId' in this.selectedCommerce && typeof this.selectedCommerce.locationId === 'object') {
+      // Convert CommerceResponseEntitie to CommerceUpdateRequestEntitie
+      return {
+        id: this.selectedCommerce.id,
+        nit: this.selectedCommerce.nit,
+        email: this.selectedCommerce.email,
+        password: this.selectedCommerce.password,
+        name: this.selectedCommerce.name,
+        locationId: this.selectedCommerce.locationId.id // Use only the ID for location
+      };
+    }
+    return this.selectedCommerce as CommerceUpdateRequestEntitie | null;
+  }
 }

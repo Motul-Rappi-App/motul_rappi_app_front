@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommerceResponseEntitie, CommerceUpdateRequestEntitie } from '../../../../core/models';
+import { CommerceResponseEntitie, LocationResponseEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-commerce-list',
@@ -13,36 +13,31 @@ import { CommerceResponseEntitie, CommerceUpdateRequestEntitie } from '../../../
 export class CommerceListComponent {
 
   @Input() commerceList: CommerceResponseEntitie[] = [];
-  @Output() editCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
+  @Output() editCommerce = new EventEmitter<CommerceResponseEntitie>();
   @Output() deleteCommerce = new EventEmitter<number>();
+
+  locationList: LocationResponseEntitie[] = [];
 
   searchTerm: string = '';
 
+
   getFilteredCommerces(): CommerceResponseEntitie[] {
+
+    if (!this.searchTerm.trim()) {
+      return this.commerceList;
+    }
+
+    const lowerSearchTerm = this.searchTerm.toLowerCase();
     return this.commerceList.filter(commerce =>
-      commerce.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      commerce.name.toLowerCase().includes(lowerSearchTerm)
     );
   }
 
   onEdit(commerce: CommerceResponseEntitie): void {
-    if (commerce.location && commerce.location.id) {
-      const commerceUpdateRequest: CommerceUpdateRequestEntitie = {
-        id: commerce.id,
-        nit: commerce.nit,
-        email: commerce.email,
-        password: commerce.password,
-        name: commerce.name,
-        locationId: commerce.location.id,
-      };
-      this.editCommerce.emit(commerceUpdateRequest);
-      
-    } else {
-      console.error("El location o location.id es undefined");
-    }
+    this.editCommerce.emit(commerce);
   }
-  
+
   onDelete(id: number): void {
     this.deleteCommerce.emit(id);
   }
-
 }

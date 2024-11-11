@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { CommerceRequestEntitie, CommerceResponseEntitie, CommerceUpdateRequestEntitie, LocationResponseEntitie } from '../../../../core/models';
-import { LocationsService } from '../../../services/locations.service';
-import { CommerceService } from '../../../services/commerce.service'; // Importa el servicio correctamente
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { CommerceRequestEntitie, CommerceUpdateRequestEntitie, LocationResponseEntitie } from '../../../../core/models';
+import { LocationsService } from '../../../services/locations.service';
 
 @Component({
   selector: 'app-commerce-form',
@@ -13,134 +12,93 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './commerce-form.component.html',
   styleUrl: './commerce-form.component.css'
 })
-export class CommerceFormComponent implements OnInit {
+export class CommerceFormComponent {
 
-  @Input() selectedCommerce: CommerceResponseEntitie | null = null;
+  @Input() locationsList: LocationResponseEntitie[] = []; 
+  @Input() selectedCommerce: CommerceUpdateRequestEntitie | null = null;
+  @Output() addCommerce = new EventEmitter<CommerceRequestEntitie>();
+  @Output() updateCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
 
   commerceForm: FormGroup;
-  locationsList: LocationResponseEntitie[] = [];
-  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private locationsService: LocationsService,
-    private commerceService: CommerceService, // Asegúrate de tener el servicio disponible
     private _toast: ToastrService,
+    private locationsService: LocationsService
   ) {
     this.commerceForm = this.fb.group({
-      name: ['', [
-        Validators.required,
-        Validators.pattern('^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú0-9]{1,50}$'),
-        this.noWhitespaceValidator
-      ]],
-      locationId: [null, Validators.required],
-      nit: ['', [
-        Validators.required,
-        Validators.pattern('^[0-9]{9,12}$'),
-        Validators.minLength(1),
-        Validators.maxLength(20)
-      ]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [
-        Validators.required,
-        Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$')
-      ]]
+      nit: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(1),
+          Validators.maxLength(20),
+          Validators.pattern(/^[0-9]{9,12}$/)  // NIT_REGEX
+        ]
+      ],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{8,}$/)  // PASSWORD_REGEX
+        ]
+      ],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú0-9]{1,50}$/)  // NAME_REGEX
+        ]
+      ],
+      locationId: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-    this.locationsService.getLocations().subscribe(data => {
-      this.locationsList = data;
-
-      if (this.selectedCommerce) {
-        this.setFormValues(this.selectedCommerce);
-      }
-    });
+    this.loadLocations();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedCommerce'] && this.selectedCommerce && this.locationsList.length > 0) {
-      this.setFormValues(this.selectedCommerce);
+  ngOnChanges(): void {
+    if (this.selectedCommerce) {
+      this.commerceForm.patchValue(this.selectedCommerce);
+    } else {
+      this.commerceForm.reset();
     }
   }
 
-  private setFormValues(commerce: CommerceResponseEntitie): void {
-    this.commerceForm.patchValue({
-      name: commerce.name,
-      locationId: commerce.location ? commerce.location.id : null,
-      nit: commerce.nit,
-      email: commerce.email,
-      password: commerce.password
+  loadLocations(): void {
+    this.locationsService.getLocations().subscribe(data => {
+      this.locationsList = data;
     });
-  }
-
-  private resetForm(): void {
-    this.commerceForm.reset();
-    this.selectedCommerce = null;
   }
 
   onSubmit(): void {
     if (this.commerceForm.valid) {
-      const commerceData = this.selectedCommerce
-        ? {
-          id: this.selectedCommerce.id,
-          ...this.commerceForm.value,
-          adminId: "1"
-        }
-        : {
-          ...this.commerceForm.value,
-          adminId: "1"
-        };
-
+      const commerceData = this.commerceForm.value;
       if (this.selectedCommerce) {
-        this.commerceService.updateCommerce(commerceData as CommerceUpdateRequestEntitie).subscribe({
-          next: () => {
-            this._toast.success('Comercio actualizado exitosamente', 'Éxito');
-            this.resetForm();
-          },
-          error: (error) => this.handleServiceError(error)
-        });
+        // Updating an existing commerce
+        this.updateCommerce.emit({ ...this.selectedCommerce, ...commerceData });
+        this._toast.success('Comercio actualizado', 'Éxito');
       } else {
-        this.commerceService.addCommerce(commerceData as CommerceRequestEntitie).subscribe({
-          next: () => {
-            this._toast.success('Comercio añadido exitosamente', 'Éxito');
-            this.resetForm();
-          },
-          error: (error) => this.handleServiceError(error)
-        });
+        // Adding a new commerce
+        const newCommerce: CommerceRequestEntitie = {
+          ...commerceData,
+          adminId: 1  // Valor quemado según requerimiento
+        };
+        this.addCommerce.emit(newCommerce);
+        this._toast.success('Comercio añadido', 'Éxito');
       }
+      this.commerceForm.reset();
     } else {
-      this._toast.error('Por favor, complete el formulario correctamente', 'Error');
+      this._toast.error('Formulario inválido', 'Error');
     }
   }
 
-  private handleServiceError(error: any): void {
-    let errorMessage = 'Ocurrió un error al procesar la solicitud. Intenta nuevamente.';
-
-    // Verificamos si el mensaje de error específico está en error.error.error
-    if (error.error && error.error.error) {
-      // Captura el mensaje de error específico del backend
-      errorMessage = error.error.error;
-    }
-
-    this._toast.error(errorMessage, 'Error');
-  }
-
-
-  noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
-    const isWhitespace = (control.value || '').trim().length === 0;
-    return isWhitespace ? { whitespace: true } : null;
-  }
-
-  get name() {
-    return this.commerceForm.get('name');
-  }
-
-  get formTitle(): string {
-    return this.selectedCommerce ? 'Editar Comercio' : 'Añadir Comercio';
-  }
-
-  get submitButtonText(): string {
-    return this.selectedCommerce ? 'Actualizar Comercio' : 'Añadir Comercio';
-  }
 }

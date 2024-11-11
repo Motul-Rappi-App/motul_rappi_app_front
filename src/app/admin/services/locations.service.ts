@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { LocationResponseEntitie, LocationRequestEntitie, LocationUpdateRequestEntitie } from '../../core/models';
 import { JwtLocalManageService } from '../../core/services/jwt-local-manage.service';
@@ -26,55 +26,58 @@ export class LocationsService {
   }
 
   getLocations(): Observable<LocationResponseEntitie[]> {
-    try {
-      const headers = this.getAuthHeaders();
-      return this.http.get<{ content: LocationResponseEntitie[] }>(this.base_back_url, { headers })
-        .pipe(
-          map(response => response.content)
-        );
-    } catch (error) {
-      console.error('Error al obtener ubicaciones:', error);
-      return throwError(() => new Error('Error al obtener ubicaciones'));
-    }
+    const headers = this.getAuthHeaders();
+    return this.http.get<{ content: LocationResponseEntitie[] }>(this.base_back_url, { headers })
+      .pipe(
+        map(response => response.content),
+        catchError(error => {
+          console.error('Error al obtener ubicaciones:', error);
+          return throwError(() => new Error('Error al obtener ubicaciones'));
+        })
+      );
   }
 
   getLocationById(id: string): Observable<LocationResponseEntitie> {
-    try {
-      const headers = this.getAuthHeaders();
-      return this.http.get<LocationResponseEntitie>(`${this.base_back_url}/${id}`, { headers });
-    } catch (error) {
-      console.error(`Error al obtener ubicación con ID ${id}:`, error);
-      return throwError(() => new Error(`Error al obtener ubicación con ID ${id}`));
-    }
+    const headers = this.getAuthHeaders();
+    return this.http.get<LocationResponseEntitie>(`${this.base_back_url}/${id}`, { headers })
+      .pipe(
+        catchError(error => {
+          console.error(`Error al obtener ubicación con ID ${id}:`, error);
+          return throwError(() => new Error(`Error al obtener ubicación con ID ${id}`));
+        })
+      );
   }
 
   addLocation(location: LocationRequestEntitie): Observable<LocationResponseEntitie> {
-    try {
-      const headers = this.getAuthHeaders();
-      return this.http.post<LocationResponseEntitie>(this.base_back_url, location, { headers });
-    } catch (error) {
-      console.error('Error al añadir ubicación:', error);
-      return throwError(() => new Error('Error al añadir ubicación'));
-    }
+    const headers = this.getAuthHeaders();
+    return this.http.post<LocationResponseEntitie>(this.base_back_url, location, { headers })
+      .pipe(
+        catchError(error => {
+          console.error('Error al añadir ubicación:', error);
+          return throwError(() => new Error('Error al añadir ubicación'));
+        })
+      );
   }
 
   updateLocation(location: LocationUpdateRequestEntitie): Observable<LocationResponseEntitie> {
-    try {
-      const headers = this.getAuthHeaders();
-      return this.http.put<LocationResponseEntitie>(this.base_back_url, location, { headers });
-    } catch (error) {
-      console.error('Error al actualizar ubicación:', error);
-      return throwError(() => new Error('Error al actualizar ubicación'));
-    }
+    const headers = this.getAuthHeaders();
+    return this.http.put<LocationResponseEntitie>(this.base_back_url, location, { headers })
+      .pipe(
+        catchError(error => {
+          console.error('Error al actualizar ubicación:', error);
+          return throwError(() => new Error('Error al actualizar ubicación'));
+        })
+      );
   }
 
   deleteLocation(id: string): Observable<void> {
-    try {
-      const headers = this.getAuthHeaders();
-      return this.http.delete<void>(`${this.base_back_url}/${id}`, { headers });
-    } catch (error) {
-      console.error(`Error al eliminar ubicación con ID ${id}:`, error);
-      return throwError(() => new Error(`Error al eliminar ubicación con ID ${id}`));
-    }
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${this.base_back_url}/${id}`, { headers })
+      .pipe(
+        catchError(error => {
+          console.error(`Error al eliminar ubicación con ID ${id}:`, error);
+          return throwError(() => new Error(`Error al eliminar ubicación con ID ${id}`));
+        })
+      );
   }
 }

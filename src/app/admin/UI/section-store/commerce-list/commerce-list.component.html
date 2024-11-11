@@ -1,20 +1,22 @@
 <div class="bg-gray-900 p-4 rounded-lg shadow-lg max-h-80 overflow-y-auto">
     <h2 class="text-xl font-semibold text-gray-100 mb-4">Comercios</h2>
 
+    <!-- Campo de búsqueda -->
     <div class="mb-4">
         <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre de comercio"
             class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
     </div>
 
+    <!-- Tabla de comercios filtrados -->
     <table class="w-full table-auto" *ngIf="getFilteredCommerces().length > 0; else noData">
         <thead>
-            <tr>
-                <th class="px-4 py-2 text-left">Nombre</th>
-                <th class="px-4 py-2 text-left">NIT</th>
-                <th class="px-4 py-2 text-left">Correo Electrónico</th>
-                <th class="px-4 py-2 text-left">Ciudad</th>
-                <th class="px-4 py-2 text-left">Fecha de Inscripción</th>
-                <th class="px-4 py-2 text-left">Acciones</th>
+            <tr class="bg-gray-800">
+                <th class="px-4 py-2 text-left text-gray-300">Nombre</th>
+                <th class="px-4 py-2 text-left text-gray-300">NIT</th>
+                <th class="px-4 py-2 text-left text-gray-300">Correo Electrónico</th>
+                <th class="px-4 py-2 text-left text-gray-300">Ciudad</th>
+                <th class="px-4 py-2 text-left text-gray-300">Fecha Inscripción</th>
+                <th class="px-4 py-2 text-left text-gray-300">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -22,10 +24,8 @@
                 <td class="px-4 py-2 text-gray-300">{{ commerce.name }}</td>
                 <td class="px-4 py-2 text-gray-300">{{ commerce.nit }}</td>
                 <td class="px-4 py-2 text-gray-300">{{ commerce.email }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ commerce.location.name || 'N/A' }}</td>
-
-                <!-- Acceso actualizado -->
-                <td class="px-4 py-2 text-gray-300">{{ commerce.inscriptionDate | date: 'MMMM d, y' }}</td>
+                <td class="px-4 py-2 text-gray-300">{{ commerce['locationName'] || 'Sin Ciudad' }}</td>
+                <td class="px-4 py-2 text-gray-300">{{ commerce.inscriptionDate | date: 'dd/MM/yyyy' }}</td>
                 <td class="px-4 py-2">
                     <div class="flex gap-2">
                         <button (click)="onEdit(commerce)"
@@ -42,6 +42,7 @@
         </tbody>
     </table>
 
+    <!-- Mensaje si no hay datos -->
     <ng-template #noData>
         <div class="text-center text-gray-400 py-4">
             No hay comercios disponibles.
