@@ -25,9 +25,7 @@ export class ViscositiesService {
 
   private getAuthHeaders(): HttpHeaders {
     const headers = this.jwtServ.tokenInHeaders;
-    if (!headers) {
-      throw new Error('Authorization headers not found');
-    }
+    if (!headers) { throw new Error('Authorization headers not found') }
     return headers;
   }
 

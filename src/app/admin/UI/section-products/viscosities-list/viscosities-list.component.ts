@@ -28,7 +28,7 @@ export class ViscositiesListComponent {
   @Output() addViscosity = new EventEmitter<void>();
 
   searchTerm: string = '';
-
+  
   onAddViscosity(): void {
     this.addViscosity.emit();
   }

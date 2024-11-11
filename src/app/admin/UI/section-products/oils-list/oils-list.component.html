@@ -19,7 +19,7 @@
       <tr *ngFor="let oil of getFilteredOils()" @listAnimation class="border-b border-gray-700">
         <td class="px-4 py-2 text-gray-300">{{ oil.id }}</td>
         <td class="px-4 py-2 text-gray-300">{{ oil.name }}</td>
-        <td class="px-4 py-2 text-gray-400">{{ getViscosityNames(oil) }}</td>
+        <td class="px-4 py-2 text-gray-400">{{ getViscosityNames(oil.viscosities) }}</td>
         <td class="px-4 py-2">
           <div class="flex flex-wrap gap-2">
             <button (click)="onEdit(oil)"

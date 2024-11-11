@@ -39,18 +39,12 @@ export class AdminLoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.verifyIfLoggedIn();
+    //this.verifyIfLoggedIn();
   }
 
   verifyIfLoggedIn(): void {
-    this.isLoading = true;
-    
-    this.authServ.checkIfLoggedIn().subscribe(isLoggedIn => {
-      this.isLoading = false;
-      if (isLoggedIn) {
-        this.router.navigate(['/admin/lobby-admin']);
-      }
-    });
+    // this.isLoading = true;
+
   }
 
   resolved(captchaResponse: string | null) {

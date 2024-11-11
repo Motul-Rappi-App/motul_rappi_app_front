@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Oil } from '../../../models/oil.model';
 import { CommonModule } from '@angular/common';
-import { ViscositiesService } from '../../../services/viscosities.service';
-import { Viscosity } from '../../../models/viscosity.model';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityResponseEntitie } from '../../../../core/models';
+import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
 
 @Component({
   selector: 'app-oils-list',
@@ -24,39 +23,42 @@ import { trigger, transition, style, animate } from '@angular/animations';
     ]),
   ],
 })
-export class OilsListComponent implements OnInit {
+export class OilsListComponent {
 
-  @Input() oilsList: Oil[] = [];
-  @Output() editOil = new EventEmitter<Oil>();
-  @Output() deleteOil = new EventEmitter<string>();
+  @Input() oilsList: OilReferenceResponseEntitie[] = [];
+  @Output() editOil = new EventEmitter<OilReferenceUpdateRequestEntitie>();
+  @Output() deleteOil = new EventEmitter<number>();
 
   searchTerm: string = '';
   viscositiesMap: { [id: string]: string } = {};
 
-  constructor(
-    private viscositiesService: ViscositiesService
-  ) { }
-
-  ngOnInit(): void {
-    
-  }
-
-  getViscosityNames(oil: Oil): string {
-    return oil.viscosities.map(id => this.viscositiesMap[id] || id).join(', ');
-  }
-
-  getFilteredOils(): Oil[] {
+  getFilteredOils(): OilReferenceResponseEntitie[] {
     return this.oilsList.filter(oil =>
       oil.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
-  onEdit(oil: Oil): void {
-    this.editOil.emit(oil);
+  getViscosityNames(viscosities: ViscosityResponseEntitie[]): string {
+    return viscosities.map(viscosity => viscosity.description).join(', ');
   }
 
-  onDelete(id: string): void {
-      this.deleteOil.emit(id);
+
+  onEdit(oil: OilReferenceResponseEntitie): void {
+    if (oil.viscosities) {
+      const oilUpdateRequest: OilReferenceUpdateRequestEntitie = {
+        id: oil.id,
+        name: oil.name,
+        viscosities: oil.viscosities.map(viscosity => viscosity.id),
+      };
+      this.editOil.emit(oilUpdateRequest);
+      
+    } else {
+      console.error("La viscosidad no existe!");
+    }
+  }
+
+  onDelete(id: number): void {
+    this.deleteOil.emit(id);
   }
 
 }

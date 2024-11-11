@@ -37,16 +37,6 @@ export class AuthService {
     }
   }
 
-  checkIfLoggedIn(): Observable<boolean> {
-    const headers = this.jwtServ.tokenInHeaders;
-    if (!headers) return of(false);
-
-    return this.http.get<any>(`${this.base_back_url}auth/login`, { headers }).pipe(
-      map(() => true),
-      catchError(() => of(false))
-    );
-  }
-
   checkToken(): Observable<any> | null {
     try {
       const headers = this.jwtServ.tokenInHeaders;
