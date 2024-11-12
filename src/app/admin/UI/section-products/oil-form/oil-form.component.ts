@@ -1,9 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
-import { Oil } from '../../../models/oil.model';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Viscosity } from '../../../models/viscosity.model';
 import { ViscositiesService } from '../../../services/viscosities.service';
 import { CommonModule } from '@angular/common';
+import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityResponseEntitie } from '../../../../core/models';
+import { OilsService } from '../../../services/oils.service';
+import { ToastrService } from 'ngx-toastr';
+import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
+import { environment } from '../../../../../environments/environment.development';
 
 @Component({
   selector: 'app-oil-form',
@@ -14,18 +18,20 @@ import { CommonModule } from '@angular/common';
 })
 export class OilFormComponent implements OnInit {
 
-  @Input() selectedOil: Oil | null = null;
-  @Output() addOil = new EventEmitter<Oil>();
-  @Output() updateOil = new EventEmitter<Oil>();
+  @Input() selectedOil: OilReferenceResponseEntitie | null = null;
+  @Output() addOil = new EventEmitter<OilReferenceRequestEntitie>();
+  @Output() updateOil = new EventEmitter<OilReferenceUpdateRequestEntitie>();
 
   currentId: number = 1;
   oilForm: FormGroup;
-  viscositiesList: Viscosity[] = [];
+  viscositiesList: ViscosityResponseEntitie[] = [];
   searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private viscositiesService: ViscositiesService
+    private viscositiesService: ViscositiesService,
+    private oilService: OilsService,
+    private _toast: ToastrService,
   ) {
     this.oilForm = this.fb.group({
       name: [
@@ -45,12 +51,15 @@ export class OilFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.viscositiesService.viscosities$.subscribe(data => {
-    //   this.viscositiesList = data;
-    // });
+    this.viscositiesService.getViscosities().subscribe(data => {
+      this.viscositiesList = data;
+      if (this.selectedOil) {
+        this.setFormValues(this.selectedOil);
+      }
+    });
   }
 
-  filteredViscosities(): Viscosity[] {
+  filteredViscosities(): ViscosityResponseEntitie[] {
     return this.viscositiesList.filter(viscosity =>
       viscosity.description.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
@@ -62,10 +71,10 @@ export class OilFormComponent implements OnInit {
     }
   }
 
-  private setFormValues(oil: Oil): void {
+  private setFormValues(oil: OilReferenceResponseEntitie): void {
     this.oilForm.patchValue({
       name: oil.name,
-      viscosities: oil.viscosities
+      viscosities: oil.viscosities.map(viscosity => viscosity.description)
     });
   }
 
@@ -76,21 +85,51 @@ export class OilFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.oilForm.valid) {
-      const oilData: Oil = {
-        id: this.selectedOil ? this.selectedOil.id : this.generateId().toString(),
-        name: this.oilForm.value.name,
-        viscosities: this.oilForm.value.viscosities,
-        idAdmin: '1',
+      const oilData = this.selectedOil
+        ? {
+          id: this.selectedOil.id,
+          ...this.oilForm.value,
+          adminId: "1"
+        }
+        : {
+          ...this.oilForm.value,
+          adminId: "1"
       };
 
       if (this.selectedOil) {
-        this.updateOil.emit(oilData);
+        this.oilService.updateOil(oilData as OilReferenceUpdateRequestEntitie).subscribe({
+          next: () => {
+            this._toast.success('Aceite actualizado exitosamente', 'Éxito', environment.TOAST_CONFIG);
+            this.updateOil.emit(oilData);
+            this.resetForm();
+          },
+          error: (error) => this.handleServiceError(error)
+        });
       } else {
-        this.addOil.emit(oilData);
+        this.oilService.addOil(oilData as OilReferenceRequestEntitie).subscribe({
+          next: () => {
+            this._toast.success('Aceite añadido exitosamente', 'Éxito', environment.TOAST_CONFIG);
+            console.log("Añadimos el aceite", oilData);
+            this.addOil.emit(oilData);
+            this.resetForm();
+          },
+          error: (error) => this.handleServiceError(error)
+        });
       }
 
-      this.resetForm();
+    } else{
+      this._toast.error('Por favor, complete el formulario correctamente', 'Error', environment.TOAST_CONFIG);
     }
+  }
+
+  private handleServiceError(error: any): void {
+    let errorMessage = 'Ocurrió un error al procesar la solicitud. Intenta nuevamente.';
+
+    if (error.error && error.error.error) {
+      errorMessage = error.error.error;
+    }
+
+    this._toast.error(errorMessage, 'Error', environment.TOAST_CONFIG);
   }
 
   noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
@@ -105,10 +144,6 @@ export class OilFormComponent implements OnInit {
 
   noOnlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
     return /^[0-9]+$/.test(control.value) ? { onlyNumbers: true } : null;
-  }
-
-  private generateId(): number {
-    return this.currentId++;
   }
 
   get name() {

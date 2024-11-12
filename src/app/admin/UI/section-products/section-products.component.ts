@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { OilsListComponent } from "./oils-list/oils-list.component";
 import { ViscositiesListComponent } from "./viscosities-list/viscosities-list.component";
-import { Oil } from '../../models/oil.model';
-import { Viscosity } from '../../models/viscosity.model';
 import { OilsService } from '../../services/oils.service';
 import { ViscositiesService } from '../../services/viscosities.service';
 import { OilFormComponent } from './oil-form/oil-form.component';
 import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.component';
-import { ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core/models';
+import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core/models';
+import { OilReferenceUpdateRequestEntitie } from '../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
 
 @Component({
   selector: 'app-section-products',
@@ -18,9 +17,9 @@ import { ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core
 })
 export class SectionProductsComponent implements OnInit {
 
-  oilsList: Oil[] = [];
+  oilsList: OilReferenceResponseEntitie[] = [];
   viscositiesList: ViscosityResponseEntitie[] = [];
-  selectedOil: Oil | null = null;
+  selectedOil: OilReferenceResponseEntitie | null = null;
 
   constructor(
     private oilsService: OilsService,
@@ -29,30 +28,43 @@ export class SectionProductsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.oilsService.oils$.subscribe(data => {
+    this.oilsService.getOils().subscribe(data => {
       this.oilsList = data;
-    })
+    });
 
     this.viscositiesService.getViscosities().subscribe(data => {
       this.viscositiesList = data;
     });
   }
 
-  onAddOil(newOil: Oil): void {
-    this.oilsService.addOil(newOil);
+  onAddOil(newOil: OilReferenceRequestEntitie): void {
+    this.oilsService.addOil(newOil).subscribe(data => {
+      this.oilsList = [...this.oilsList, data];
+    });
+  }  
+
+  onEditOil(oil: OilReferenceUpdateRequestEntitie): void {
+    this.selectedOil = {
+      ...this.selectedOil,
+      ...oil
+    } as unknown as OilReferenceResponseEntitie;
   }
 
-  onEditOil(oil: Oil): void {
-    this.selectedOil = oil;
+  onUpdateOil(updateOil: OilReferenceUpdateRequestEntitie): void {
+    this.oilsService.updateOil(updateOil).subscribe(() => {
+      this.oilsService.getOils().subscribe(data => {
+        this.oilsList = data;
+      });
+      this.selectedOil = null;
+    });
   }
 
-  onUpdateOil(updatedOil: Oil): void {
-    this.oilsService.updateOil(updatedOil.id, updatedOil);
-    this.selectedOil = null;
-  }
-
-  onDeleteOil(id: string): void {
-    this.oilsService.deleteOil(id);
+  onDeleteOil(id: number): void {
+    this.oilsService.deleteOil(id).subscribe(() => {
+      this.oilsService.getOils().subscribe(data => {
+        this.oilsList = data;
+      });
+    });
   }
 
   onAddViscosity(newViscosity: ViscosityRequestEntitie): void { 
