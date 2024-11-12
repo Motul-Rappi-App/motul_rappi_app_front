@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SelectProductComponent } from "./select-product/select-product.component";
+import { SelectProductComponent } from './select-product/select-product.component';
 
 @Component({
   selector: 'app-valid-promotion',

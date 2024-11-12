@@ -7,6 +7,8 @@ import { OilFormComponent } from './oil-form/oil-form.component';
 import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.component';
 import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core/models';
 import { OilReferenceUpdateRequestEntitie } from '../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-section-products',
@@ -23,7 +25,8 @@ export class SectionProductsComponent implements OnInit {
 
   constructor(
     private oilsService: OilsService,
-    private viscositiesService: ViscositiesService
+    private viscositiesService: ViscositiesService,
+    private _toast: ToastrService,
   ) { }
 
   ngOnInit(): void {
@@ -39,7 +42,7 @@ export class SectionProductsComponent implements OnInit {
 
   onAddOil(newOil: OilReferenceRequestEntitie): void {
     this.oilsService.addOil(newOil).subscribe(data => {
-      this.oilsList = [...this.oilsList, data];
+      this.oilsList.push(data);
     });
   }  
 
@@ -69,6 +72,7 @@ export class SectionProductsComponent implements OnInit {
 
   onAddViscosity(newViscosity: ViscosityRequestEntitie): void { 
     this.viscositiesService.addViscosity(newViscosity).subscribe(data => {
+      this._toast.success('Viscosidad agregada correctamente', 'Exito',  environment.TOAST_CONFIG);
       this.viscositiesList.push(data);
     });
   }
