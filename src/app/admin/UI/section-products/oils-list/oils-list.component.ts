@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityResponseEntitie } from '../../../../core/models';
+import { OilReferenceResponseEntitie, ViscosityResponseEntitie } from '../../../../core/models';
 import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
 
 @Component({

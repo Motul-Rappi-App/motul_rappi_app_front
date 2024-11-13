@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommerceFormComponent } from './commerce-form/commerce-form.component';
-import { CommerceListComponent } from './commerce-list/commerce-list.component';
 import { Commerce } from '../../models/commerce.model';
 import { CommerceService } from '../../services/commerce.service';
 import { LocationRequestEntitie, LocationResponseEntitie } from '../../../core/models';
 import { LocationsService } from '../../services/locations.service';
 import { CityListComponent } from './location-list/city-list.component';
 import { CityFormComponent } from './location-form/city-form.component';
+import { CommerceFormComponent } from './commerce-form/commerce-form.component';
+import { CommerceListComponent } from './commerce-list/commerce-list.component';
 
 @Component({
   selector: 'app-section-store',
   standalone: true,
-  imports: [CommerceFormComponent, CommerceListComponent, CityListComponent, CityFormComponent],
+  imports: [ CityListComponent, CityFormComponent, CommerceFormComponent, CommerceListComponent ],
   templateUrl: './section-store.component.html',
   styleUrl: './section-store.component.css'
 })

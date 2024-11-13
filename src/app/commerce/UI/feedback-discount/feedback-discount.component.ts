@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InvalidPromotionComponent } from './invalid-promotion/invalid-promotion.component';
-import { ValidPromotionComponent } from './valid-promotion/valid-promotion.component';
+import { ValidPromotionComponent } from "./valid-promotion/valid-promotion.component";
 
 @Component({
   selector: 'app-feedback-discount',
   standalone: true,
-  imports: [CommonModule, FormsModule, InvalidPromotionComponent, ValidPromotionComponent],
+  imports: [CommonModule, FormsModule, InvalidPromotionComponent, InvalidPromotionComponent, ValidPromotionComponent],
   templateUrl: './feedback-discount.component.html',
   styleUrls: ['./feedback-discount.component.css']
 })

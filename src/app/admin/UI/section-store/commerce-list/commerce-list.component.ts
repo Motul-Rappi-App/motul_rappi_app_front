@@ -21,7 +21,9 @@ export class CommerceListComponent implements OnInit {
   searchTerm: string = '';
   citiesMap: { [id: string]: string } = {};
 
-  constructor(private citiesService: CitiesService) { }
+  constructor(
+    private citiesService: CitiesService,
+  ) { }
 
   ngOnInit(): void {
     this.citiesService.cities$.subscribe((cities: City[]) => {
