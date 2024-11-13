@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Viscosity } from '../../../models/viscosity.model';
 import { CommonModule } from '@angular/common';
+import { ViscosityRequestEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-viscosities-form',
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './viscosities-form.component.css'
 })
 export class ViscositiesFormComponent {
-  @Output() addViscosity = new EventEmitter<Viscosity>();
+  @Output() addViscosity = new EventEmitter<ViscosityRequestEntitie>();
 
   viscosityForm: FormGroup;
 
@@ -48,13 +48,17 @@ export class ViscositiesFormComponent {
 
   onSubmit(): void {
     if (this.viscosityForm.valid) {
-      const newViscosity: Viscosity = {
-        id: Math.random().toString(36).substring(2),
-        description: this.viscosityForm.value.description,
-        idAdmin: '1'
-      };
-      this.addViscosity.emit(newViscosity);
+      const newViscosity: ViscosityRequestEntitie = this.viscosityForm.value;
+    
+      const viscosity = {
+        description: newViscosity.description,
+        adminId: 1
+      }
+
+      this.addViscosity.emit(viscosity);
       this.viscosityForm.reset();
+    } else {
+      console.log('Formulario inválido', this.viscosityForm);
     }
   }
 }

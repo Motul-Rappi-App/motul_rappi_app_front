@@ -1,57 +1,81 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Oil } from '../models/oil.model';
+import { BehaviorSubject, map, Observable, of } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
+import { OilReferenceRequestEntitie, OilReferenceResponseEntitie } from '../../core/models';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { JwtLocalManageService } from '../../core/services/jwt-local-manage.service';
+import { ToastrService } from 'ngx-toastr';
+import { OilReferenceUpdateRequestEntitie } from '../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OilsService {
 
-  private localStorageKey = 'oils';
+  private base_back_url: string = `${environment.BACKEND_BASE_URL}oilReference`;
 
-  private oilsSubject = new BehaviorSubject<Oil[]>(this.loadOilsFromStorage());
-  oils$ = this.oilsSubject.asObservable();
+  constructor(
+    private http: HttpClient,
+    private jwtServ: JwtLocalManageService,
+    private _toast: ToastrService
+  ) { }
 
-  constructor() { }
-
-  private loadOilsFromStorage(): Oil[] {
-    return JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
+  private getAuthHeaders(): HttpHeaders {
+    const headers = this.jwtServ.tokenInHeaders;
+    if (!headers) { throw new Error('Authorization headers not found') }
+    return headers;
   }
 
-  getOils(): Observable<Oil[]> {
-    return this.oils$;
+  getOils(): Observable<OilReferenceResponseEntitie[]> {
+    try {
+      const headers = this.getAuthHeaders();
+      return this.http.get<{ content: OilReferenceResponseEntitie[] }>(this.base_back_url, { headers })
+        .pipe(
+          map(response => response.content)
+        );
+    } catch (error) {
+      this._toast.error('Error al obtener los Aceites', 'Error', environment.TOAST_CONFIG);
+      return of([]);
+    }
   }
-
-  getOilById(id: string): Observable<Oil | undefined> {
-    const oils = this.oilsSubject.getValue();
-    const oil = oils.find((o: Oil) => o.id === id);
-    return of(oil);
-  }
-
-  addOil(oil: Oil): void {
-    const currentOils = this.oilsSubject.getValue();
-    const updatedOils = [...currentOils, oil];
-
-    this.oilsSubject.next(updatedOils);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(updatedOils));
-  }
-
-  updateOil(id: string, updatedOil: Oil): void {
-    const currentOils = this.oilsSubject.getValue();
-    const index = currentOils.findIndex((o: Oil) => o.id === id);
-
-    if (index > -1) {
-      currentOils[index] = updatedOil;
-      this.oilsSubject.next([...currentOils]);
-      localStorage.setItem(this.localStorageKey, JSON.stringify(currentOils));
+  
+  getOilById(id: string): Observable<OilReferenceResponseEntitie> {
+    try{
+      const headers = this.getAuthHeaders();
+      return this.http.get<OilReferenceResponseEntitie>(`${this.base_back_url}/${id}`, { headers });
+    }catch(error){
+      this._toast.error('Error al obtener el Aceite', 'Error', environment.TOAST_CONFIG);
+      return of();
     }
   }
 
-  deleteOil(id: string): void {
-    const currentOils = this.oilsSubject.getValue();
-    const updatedOils = currentOils.filter((o: Oil) => o.id !== id);
+  addOil(oil: OilReferenceRequestEntitie): Observable<OilReferenceResponseEntitie> {
+    try{
+      const headers = this.getAuthHeaders();
+      return this.http.post<OilReferenceResponseEntitie>(this.base_back_url, oil, { headers });
+    } catch (error) {
+      this._toast.error('Error al agregar el Aceite', 'Error', environment.TOAST_CONFIG);
+      return of();
+    }
+  }
 
-    this.oilsSubject.next(updatedOils);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(updatedOils));
+  updateOil(oil: OilReferenceUpdateRequestEntitie): Observable<OilReferenceResponseEntitie> {
+    try{
+      const headers = this.getAuthHeaders();
+      return this.http.put<OilReferenceResponseEntitie>(this.base_back_url, oil, { headers });
+    } catch (error) {
+      this._toast.error('Error al actualizar el Aceite', 'Error', environment.TOAST_CONFIG);
+      return of();
+    }
+  }
+
+  deleteOil(id: number): Observable<void> {
+    try{
+      const headers = this.getAuthHeaders();
+      return this.http.delete<void>(`${this.base_back_url}/${id}`, { headers });
+    } catch (error) {
+      this._toast.error('Error al eliminar el Aceite', 'Error', environment.TOAST_CONFIG);
+      return of();
+    }
   }
 }

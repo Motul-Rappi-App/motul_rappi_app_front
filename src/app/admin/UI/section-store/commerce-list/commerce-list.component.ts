@@ -20,7 +20,6 @@ export class CommerceListComponent {
 
   searchTerm: string = '';
 
-
   getFilteredCommerces(): CommerceResponseEntitie[] {
 
     if (!this.searchTerm.trim()) {
