@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Viscosity } from '../../../models/viscosity.model';
 import { CommonModule } from '@angular/common';
 import { ViscosityRequestEntitie } from '../../../../core/models';
 
