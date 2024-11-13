@@ -1,9 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Commerce } from '../../../models/commerce.model';
-import { CitiesService } from '../../../services/cities.service';
-import { City } from '../../../models/city.model';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommerceResponseEntitie, LocationResponseEntitie } from '../../../../core/models';
 
 @Component({
   selector: 'app-commerce-list',
@@ -12,39 +10,33 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './commerce-list.component.html',
   styleUrl: './commerce-list.component.css'
 })
-export class CommerceListComponent implements OnInit {
+export class CommerceListComponent {
 
-  @Input() commerceList: Commerce[] = [];
-  @Output() editCommerce = new EventEmitter<Commerce>();
-  @Output() deleteCommerce = new EventEmitter<string>();
+  @Input() commerceList: CommerceResponseEntitie[] = [];
+  @Output() editCommerce = new EventEmitter<CommerceResponseEntitie>();
+  @Output() deleteCommerce = new EventEmitter<number>();
+
+  locationList: LocationResponseEntitie[] = [];
 
   searchTerm: string = '';
-  citiesMap: { [id: string]: string } = {};
 
-  constructor(
-    private citiesService: CitiesService,
-  ) { }
+  getFilteredCommerces(): CommerceResponseEntitie[] {
 
-  ngOnInit(): void {
-    this.citiesService.cities$.subscribe((cities: City[]) => {
-      this.citiesMap = cities.reduce((acc, city) => {
-        acc[city.id] = city.name;
-        return acc;
-      }, {} as { [id: string]: string });
-    });
-  }
+    if (!this.searchTerm.trim()) {
+      return this.commerceList;
+    }
 
-  getFilteredCommerces(): Commerce[] {
+    const lowerSearchTerm = this.searchTerm.toLowerCase();
     return this.commerceList.filter(commerce =>
-      commerce.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      commerce.name.toLowerCase().includes(lowerSearchTerm)
     );
   }
 
-  onEdit(commmerce: Commerce): void {
-    this.editCommerce.emit(commmerce);
+  onEdit(commerce: CommerceResponseEntitie): void {
+    this.editCommerce.emit(commerce);
   }
 
-  onDelete(id: string): void {
+  onDelete(id: number): void {
     this.deleteCommerce.emit(id);
   }
 }

@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Commerce } from '../../../models/commerce.model';
-import { City } from '../../../models/city.model';
-import { CitiesService } from '../../../services/cities.service';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { CommerceRequestEntitie, CommerceUpdateRequestEntitie, LocationResponseEntitie } from '../../../../core/models';
+import { LocationsService } from '../../../services/locations.service';
 
 @Component({
   selector: 'app-commerce-form',
@@ -14,126 +14,96 @@ import { CommonModule } from '@angular/common';
 })
 export class CommerceFormComponent {
 
-  @Input() selectedCommerce: Commerce | null = null;
-  @Output() addCommerce = new EventEmitter<Commerce>();
-  @Output() updateCommerce = new EventEmitter<Commerce>();
+  @Input() locationsList: LocationResponseEntitie[] = [];
+  @Input() selectedCommerce: CommerceUpdateRequestEntitie | null = null;
+  @Output() addCommerce = new EventEmitter<CommerceRequestEntitie>();
+  @Output() updateCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
 
   commerceForm: FormGroup;
-  citiesList: City[] = [];
-  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private citiesService: CitiesService
+    private _toast: ToastrService,
+    private locationsService: LocationsService
   ) {
     this.commerceForm = this.fb.group({
-      name: [
+      nit: [
         '',
         [
           Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(50),
-          Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚ0-9 ]+$'),
-          this.noWhitespaceValidator,
-          this.noConsecutiveCharactersValidator,
-          this.noOnlyNumbersValidator,
+          Validators.minLength(1),
+          Validators.maxLength(20),
+          Validators.pattern(/^[0-9]{9,12}$/)  // NIT_REGEX
         ]
       ],
-      cities: [[], Validators.required],
-      nit: ['', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(5), Validators.maxLength(20)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ],
       password: [
         '',
         [
           Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(20),
-          Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')
+          Validators.pattern(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{8,}$/)  // PASSWORD_REGEX
         ]
       ],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú0-9]{1,50}$/)  // NAME_REGEX
+        ]
+      ],
+      locationId: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-    this.citiesService.cities$.subscribe(data => {
-      this.citiesList = data;
-    });
+    this.loadLocations();
   }
 
-  filteredCities(): City[] {
-    return this.citiesList.filter(city =>
-      city.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedCommerce'] && this.selectedCommerce) {
-      this.setFormValues(this.selectedCommerce);
+  ngOnChanges(): void {
+    if (this.selectedCommerce) {
+      this.commerceForm.patchValue(this.selectedCommerce);
+      // Deshabilita el campo de correo si se está editando
+      this.commerceForm.get('email')?.disable();
+    } else {
+      this.commerceForm.reset();
+      // Habilita el campo de correo si se está añadiendo un nuevo comercio
+      this.commerceForm.get('email')?.enable();
     }
   }
 
-  private setFormValues(commerce: Commerce): void {
-    this.commerceForm.patchValue({
-      name: commerce.name,
-      cities: commerce.idCity,
-      nit: commerce.nit,
-      email: commerce.email,
-      password: commerce.password,
-      date: commerce.date
-    });
-  }
 
-  private resetForm(): void {
-    this.commerceForm.reset();
-    this.selectedCommerce = null;
+  loadLocations(): void {
+    this.locationsService.getLocations().subscribe(data => {
+      this.locationsList = data;
+    });
   }
 
   onSubmit(): void {
     if (this.commerceForm.valid) {
-      const commerceData: Commerce = {
-        id: Math.random().toString(36).substring(2),
-        name: this.commerceForm.value.name,
-        idCity: this.commerceForm.value.cities,
-        nit: this.commerceForm.value.nit,
-        email: this.commerceForm.value.email,
-        password: this.commerceForm.value.password,
-        date: this.selectedCommerce ? this.selectedCommerce.date : new Date().toISOString().split('T')[0],
-        idAdmin: '1'
-      };
-
+      const commerceData = this.commerceForm.value;
       if (this.selectedCommerce) {
-        this.updateCommerce.emit(commerceData);
+        // Updating an existing commerce
+        this.updateCommerce.emit({ ...this.selectedCommerce, ...commerceData });
+        this._toast.success('Comercio actualizado', 'Éxito');
       } else {
-        this.addCommerce.emit(commerceData);
+        // Adding a new commerce
+        const newCommerce: CommerceRequestEntitie = {
+          ...commerceData,
+          adminId: 1  // Valor quemado según requerimiento
+        };
+        this.addCommerce.emit(newCommerce);
+        this._toast.success('Comercio añadido', 'Éxito');
       }
-
-      this.resetForm();
+      this.commerceForm.reset();
+    } else {
+      this._toast.error('Formulario inválido', 'Error');
     }
   }
 
-  noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
-    const isWhitespace = (control.value || '').trim().length === 0;
-    return isWhitespace ? { whitespace: true } : null;
-  }
-
-  noConsecutiveCharactersValidator(control: AbstractControl): ValidationErrors | null {
-    const regex = /(.)\1{2,}/;
-    return regex.test(control.value) ? { consecutiveCharacters: true } : null;
-  }
-
-  noOnlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
-    return /^[0-9]+$/.test(control.value) ? { onlyNumbers: true } : null;
-  }
-
-  get name() {
-    return this.commerceForm.get('name');
-  }
-
-  get formTitle(): string {
-    return this.selectedCommerce ? 'Editar Comercio' : 'Añadir Comercio';
-  }
-
-  get submitButtonText(): string {
-    return this.selectedCommerce ? 'Actualizar Comercio' : 'Añadir Comercio';
-  }
 }

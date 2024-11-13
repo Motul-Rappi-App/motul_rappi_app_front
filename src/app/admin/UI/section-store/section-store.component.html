@@ -4,20 +4,22 @@
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg">
       <app-commerce-list [commerceList]="commerceList" (editCommerce)="onEditCommerce($event)"
-        (deleteCommerce)="onDeleteCommerce($event)"></app-commerce-list>
+        (deleteCommerce)="onDeleteCommerce($event)">
+      </app-commerce-list>
     </section>
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg">
-      <app-commerce-form [selectedCommerce]="selectedCommerce" (addCommerce)="onAddCommerce($event)"
-        (updateCommerce)="onUpdateCommerce($event)"></app-commerce-form>
+      <app-commerce-form [locationsList]="locationsList" [selectedCommerce]="selectedCommerceForForm" (addCommerce)="onAddCommerce($event)"
+        (updateCommerce)="onUpdateCommerce($event)">
+      </app-commerce-form>
     </section>
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg mt-2">
-      <app-city-list [locationsList]="locationsList"></app-city-list>
+      <app-location-list [locationsList]="locationsList"></app-location-list>
     </section>
 
     <section class="md:col-span-3 p-4 bg-gray-800 shadow-lg rounded-lg mt-2">
-      <app-city-form (addLocation)="onAddLocation($event)"></app-city-form>
+      <app-location-form (addLocation)="onAddLocation($event)"></app-location-form>
     </section>
 
   </div>
