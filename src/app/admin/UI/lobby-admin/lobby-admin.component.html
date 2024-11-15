@@ -1,0 +1,23 @@
+<div class="min-h-screen flex flex-col items-center justify-center p-8 text-gray-100">
+    <div class="text-center">
+
+        <h1 class="text-5xl font-bold text-gray-100 mb-12">Menu de Administrador</h1>
+
+        <div class="flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0 justify-center items-center">
+            <!-- Botón Sección Comercios -->
+            <button (click)="goToComercios()" class="w-full md:w-auto px-16 py-8 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-semibold rounded-2xl text-2xl text-center dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-500">
+                Sección Comercios
+            </button>
+
+            <!-- Botón Sección Productos -->
+            <button (click)="goToProductos()" class="w-full md:w-auto px-16 py-8 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-semibold rounded-2xl text-2xl text-center dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-500">
+                Sección Productos
+            </button>
+
+            <!-- Botón Descargar Información -->
+            <button (click)="goToDescargar()" class="w-full md:w-auto px-16 py-8 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-semibold rounded-2xl text-2xl text-center dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-500">
+                Descargar Información
+            </button>
+        </div>
+    </div>
+</div>

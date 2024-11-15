@@ -1,0 +1,17 @@
+<div class="min-h-screen flex flex-col items-center justify-center p-8 text-gray-100">
+    <div class="text-center">
+
+        <h1 class="text-5xl font-bold text-gray-100 mb-12">Menu de Vendedores</h1>
+        <div class="flex flex-col space-y-8 justify-center items-center">
+            <!-- Botón Redimir Descuento -->
+            <button (click)="goToRedeem()" class="w-full md:w-auto px-16 py-8 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-semibold rounded-2xl text-2xl text-center dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-500">
+              Redimir Descuento
+            </button>
+
+            <!-- Enlace Inscribir RT -->
+            <a (click)="goToRegister()" class="text-sm font-medium text-gray-800 underline hover:underline hover:text-gray-800 dark:text-white dark:hover:text-gray-800 cursor-pointer">
+                Inscribir Rappi Tendero
+            </a>            
+        </div>
+    </div>
+</div>

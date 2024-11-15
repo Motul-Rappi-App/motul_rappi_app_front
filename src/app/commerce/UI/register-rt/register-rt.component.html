@@ -1,0 +1,161 @@
+<app-forms-container title="Incripción de Rappi Tendero">
+
+  <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" class="space-y-4 md:space-y-6">
+
+    <!-- Cédula -->
+    <div>
+      <label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Cédula
+      </label>
+      <input
+        type="text"
+        id="cedula"
+        formControlName="cedula"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Ej. 123456789"
+        maxlength="14"/>
+        <p *ngIf="cedula?.invalid && (cedula?.dirty || cedula?.touched)" class="text-red-500 text-sm mt-1">
+            <span *ngIf="cedula?.errors?.['required']">La cédula es obligatoria.</span>
+            <span *ngIf="cedula?.errors?.['pattern']">Debe contener solo números enteros.</span>
+            <span *ngIf="cedula?.errors?.['minlength']">Debe tener al menos 8 caracteres.</span>
+        </p>                 
+    </div>
+
+    <!-- Nombre Completo -->
+    <div>
+      <label for="nombreCompleto" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Nombre Completo
+      </label>
+      <input
+        type="text"
+        id="nombreCompleto"
+        formControlName="nombreCompleto"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Ej. Juan Pérez"
+      />
+      <p *ngIf="nombreCompleto?.invalid && (nombreCompleto?.dirty || nombreCompleto?.touched)" class="text-red-500 text-sm mt-1">
+        <span *ngIf="nombreCompleto?.errors?.['required']">El nombre completo es obligatorio.</span>
+        <span *ngIf="nombreCompleto?.errors?.['pattern']">Debe contener solo letras.</span>
+      </p>
+    </div>
+
+    <!-- Rappi Token -->
+    <div>
+      <label for="rappiToken" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Rappi Token
+      </label>
+      <input
+        type="text"
+        id="rappiToken"
+        formControlName="rappiToken"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Ingrese el rappi token"
+      />
+      <p *ngIf="rappiToken?.invalid && (rappiToken?.dirty || rappiToken?.touched)" class="text-red-500 text-sm mt-1">
+        <span *ngIf="rappiToken?.errors?.['required']">El token es obligatorio.</span>
+      </p>
+    </div>
+
+    <!-- Marca de Moto -->
+    <div>
+      <label for="marcaMoto" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Marca de Moto
+      </label>
+      <select
+        id="marcaMoto"
+        formControlName="marcaMoto"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione una marca de moto</option>
+        <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+      </select>
+      <p *ngIf="marcaMoto?.invalid && (marcaMoto?.dirty || marcaMoto?.touched)" class="text-red-500 text-sm mt-1">
+        La marca de moto es obligatoria.
+      </p>
+    </div>
+
+    <!-- Cilindraje -->
+    <div>
+      <label for="cilindraje" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Cilindraje
+      </label>
+      <select
+        id="cilindraje"
+        formControlName="cilindraje"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione el cilindraje</option>
+        <option *ngFor="let cc of displacement" [value]="cc">{{ cc }}</option>
+      </select>
+      <p *ngIf="cilindraje?.invalid && (cilindraje?.dirty || cilindraje?.touched)" class="text-red-500 text-sm mt-1">
+        El cilindraje es obligatorio.
+      </p>
+    </div>
+
+    <!-- Año -->
+    <div>
+      <label for="anio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Año
+      </label>
+      <select
+        id="anio"
+        formControlName="anio"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione el año</option>
+        <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+      </select>
+      <p *ngIf="anio?.invalid && (anio?.dirty || anio?.touched)" class="text-red-500 text-sm mt-1">
+        El año es obligatorio.
+      </p>
+    </div>
+
+    <!-- Tiempos del Motor -->
+    <div>
+      <label for="tiemposMotor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Tiempos del Motor
+      </label>
+      <select
+        id="tiemposMotor"
+        formControlName="tiemposMotor"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="" disabled selected>Seleccione los tiempos del motor</option>
+        <option value="2 tiempos">2 tiempos</option>
+        <option value="4 tiempos">4 tiempos</option>
+        <option value="eléctrico">Eléctrico</option>
+      </select>
+      <p *ngIf="tiemposMotor?.invalid && (tiemposMotor?.dirty || tiemposMotor?.touched)" class="text-red-500 text-sm mt-1">
+        Seleccione los tiempos del motor.
+      </p>
+    </div>
+
+    <!-- Referencia -->
+    <div>
+      <label for="referencia" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Referencia
+      </label>
+      <input
+        type="text"
+        id="referencia"
+        formControlName="referencia"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Ingrese la referencia"
+      />
+      <p *ngIf="referencia?.invalid && (referencia?.dirty || referencia?.touched)" class="text-red-500 text-sm mt-1">
+        La referencia es obligatoria.
+      </p>
+    </div>
+
+    <button type="submit" [ngClass]="{
+        'bg-green-700 hover:bg-green-800': inscriptionForm.valid,
+        'bg-gray-700 cursor-not-allowed': inscriptionForm.invalid
+      }" 
+      class="text-white font-semibold py-2 px-4 rounded-lg w-full" 
+      [disabled]="inscriptionForm.invalid">
+      Inscribir
+    </button>
+
+  </form>
+  <app-spinner *ngIf="isLoading"></app-spinner>
+</app-forms-container>
