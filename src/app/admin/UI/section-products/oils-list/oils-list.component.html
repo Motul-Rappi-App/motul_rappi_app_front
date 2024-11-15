@@ -9,7 +9,6 @@
   <table class="w-full table-auto" *ngIf="getFilteredOils().length > 0; else noData">
     <thead>
       <tr >
-        <th class="px-4 py-2 text-left">ID</th>
         <th class="px-4 py-2 text-left">Nombre</th>
         <th class="px-4 py-2 text-left">Viscosidad(es)</th>
         <th class="px-4 py-2 text-left">Acciones</th>
@@ -17,7 +16,6 @@
     </thead>
     <tbody>
       <tr *ngFor="let oil of getFilteredOils()" @listAnimation class="border-b border-gray-700">
-        <td class="px-4 py-2 text-gray-300">{{ oil.id }}</td>
         <td class="px-4 py-2 text-gray-300">{{ oil.name }}</td>
         <td class="px-4 py-2 text-gray-400">{{ getViscosityNames(oil.viscosities) }}</td>
         <td class="px-4 py-2">

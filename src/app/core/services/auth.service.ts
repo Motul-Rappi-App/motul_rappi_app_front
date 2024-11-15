@@ -1,26 +1,25 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { JwtLocalManageService } from './jwt-local-manage.service';
-import { AuthenticationRequestEntitie, AuthenticationResponseEntitie, CommerceRequestEntitie, CommerceResponseEntitie } from '../models';
+import { environment } from '../../../environments/environment.development';
+
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { JwtLocalManageService } from './jwt-local-manage.service';
+import { AuthenticationRequestEntity, AuthenticationResponseEntity, CommerceRequestEntity, CommerceResponseEntity } from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private base_back_url = environment.BACKEND_BASE_URL;
-
   constructor(
     private http: HttpClient,
     private jwtServ: JwtLocalManageService
   ) { }
 
-  registerCommerce(commerce: CommerceRequestEntitie): Observable<CommerceResponseEntitie> | null {
+  registerCommerce(commerce: CommerceRequestEntity): Observable<CommerceResponseEntity> | null {
     try {
-      return this.http.post<CommerceResponseEntitie>(`${this.base_back_url}commerce`, commerce);
+      return this.http.post<CommerceResponseEntity>(`${environment.BACKEND_URLS.BACKEND_BASE_URL_1}commerce`, commerce, { headers: this.jwtServ.tokenInHeaders || new HttpHeaders() });
     } catch (error) {
 
       console.error(error);
@@ -28,20 +27,21 @@ export class AuthService {
     }
   }
 
-  login(credentials: AuthenticationRequestEntitie): Observable<AuthenticationResponseEntitie> | null {
+  login(credentials: AuthenticationRequestEntity): Observable<AuthenticationResponseEntity> | null {
     try {
-      return this.http.post<AuthenticationResponseEntitie>(`${this.base_back_url}auth/login`, credentials);
+      return this.http.post<AuthenticationResponseEntity>(`${environment.BACKEND_URLS.BACKEND_BASE_URL_1}auth/login`, credentials);
     } catch (error) {
       console.error(error);
       return null;
     }
   }
 
+  //TODO refactorizar este metodo cuanto el jwt este bien implmentado en AuthenticationEntity
   checkToken(): Observable<any> | null {
     const headers = this.jwtServ.tokenInHeaders;
     if (!headers) return of(null);
 
-    return this.http.get<any>(`${this.base_back_url}auth/checkToken`, { headers }).pipe(
+    return this.http.get<any>(`${environment.BACKEND_URLS.BACKEND_BASE_URL_1}auth/checkToken`, { headers }).pipe(
       map(response => response),
       catchError(error => {
         console.log('Error al verificar el token:', error);

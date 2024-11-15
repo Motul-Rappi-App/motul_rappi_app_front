@@ -1,4 +1,4 @@
-<div class="bg-gray-900 p-4 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+<div class="bg-gray-900 p-4 rounded-lg shadow-lg max-h-80 overflow-y-auto h-100">
     <h2 class="text-xl font-semibold text-gray-100 mb-4">Comercios</h2>
 
     <div class="mb-4">
@@ -6,26 +6,26 @@
             class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
     </div>
 
-    <table class="w-full table-auto" *ngIf="getFilteredCommerces().length > 0; else noData">
+    <table class="w-full h-auto table-auto text-[10px]" *ngIf="getFilteredCommerces().length > 0; else noData">
         <thead>
             <tr>
-                <th class="px-4 py-2 text-left">Nombre</th>
-                <th class="px-4 py-2 text-left">NIT</th>
-                <th class="px-4 py-2 text-left">Correo Electrónico</th>
-                <th class="px-4 py-2 text-left">Ciudad</th>
-                <th class="px-4 py-2 text-left">Fecha</th>
-                <th class="px-4 py-2 text-left">Acciones</th>
+                <th class="px-4 py-2 text-left w-1/6">Nombre</th>
+                <th class="px-4 py-2 text-left w-1/6">NIT</th>
+                <th class="px-4 py-2 text-left w-1/6">Correo Electrónico</th>
+                <th class="px-4 py-2 text-left w-1/6">Ciudad</th>
+                <th class="px-4 py-2 text-left w-1/6">Fecha</th>
+                <th class="px-4 py-2 text-left w-1/6">Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let commerce of getFilteredCommerces()" class="border-b border-gray-700">
-                <td class="px-4 py-2 text-gray-300">{{ commerce.name }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ commerce.nit }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ commerce.email }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ citiesMap[commerce.idCity] || 'N/A' }}</td>
-                <td class="px-4 py-2 text-gray-300">{{ commerce.date }}</td>
+                <td class="px-4 py-2 text-gray-300 break-words w-1/6">{{ commerce.name }}</td>
+                <td class="px-4 py-2 text-gray-300 break-words w-1/6">{{ commerce.nit }}</td>
+                <td class="px-4 py-2 text-gray-300 break-words w-1/6">{{ commerce.credential.email }}</td>
+                <td class="px-4 py-2 text-gray-300 break-words w-1/6">{{ commerce.location.name || 'N/A' }}</td>
+                <td class="px-4 py-2 text-gray-300 break-words w-1/6 text-[10px]">{{ commerce.inscriptionDate }}</td>
                 <td class="px-4 py-2">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 w-1/6">
                         <button (click)="onEdit(commerce)"
                             class="bg-yellow-600 text-white font-semibold py-1 px-3 rounded-lg hover:bg-yellow-700 transition duration-200">
                             Editar

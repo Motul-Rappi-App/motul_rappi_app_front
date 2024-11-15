@@ -25,7 +25,9 @@
     <select id="viscosities" formControlName="viscosities" multiple
       class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
       <option *ngIf="filteredViscosities().length === 0" disabled>No hay viscosidades disponibles</option>
-      <option *ngFor="let viscosity of filteredViscosities()" [value]="viscosity.id">
+      <option *ngFor="let viscosity of filteredViscosities()" 
+              [value]="viscosity.id" 
+              [selected]="isViscositySelected(viscosity.id)">
         {{ viscosity.description }}
       </option>
     </select>

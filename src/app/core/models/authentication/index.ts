@@ -1,2 +1,2 @@
-export * from './AuthenticationRequest.entitie';
-export * from './AuthenticationResponse.entitie';
+export * from './AuthenticationRequest.entity';
+export * from './AuthenticationResponse.entity';

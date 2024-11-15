@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Commerce } from '../../models/commerce.model';
-import { CommerceService } from '../../services/commerce.service';
-import { LocationRequestEntitie, LocationResponseEntitie } from '../../../core/models';
-import { LocationsService } from '../../services/locations.service';
+import { Component } from '@angular/core';
+
+import { CommerceLocalService } from '../../services';
 import { CityListComponent } from './location-list/city-list.component';
 import { CityFormComponent } from './location-form/city-form.component';
 import { CommerceFormComponent } from './commerce-form/commerce-form.component';
 import { CommerceListComponent } from './commerce-list/commerce-list.component';
+import {  CommerceResponseEntity, CommerceUpdateRequestEntity, LocationResponseEntity } from '../../../core/models';
 
 @Component({
   selector: 'app-section-store',
@@ -15,48 +14,24 @@ import { CommerceListComponent } from './commerce-list/commerce-list.component';
   templateUrl: './section-store.component.html',
   styleUrl: './section-store.component.css'
 })
-export class SectionStoreComponent implements OnInit {
+export class SectionStoreComponent{
 
-  locationsList: LocationResponseEntitie[] = [];
-  commerceList: Commerce[] = [];
-  selectedCommerce: Commerce | null = null;
+  locationsList: LocationResponseEntity[] = [];
+  commerceList: CommerceResponseEntity[] = [];
+  selectedCommerce: CommerceResponseEntity | null = null;
 
-  constructor(
-    private locationsService: LocationsService,
-    private commerceService: CommerceService
-  ) { }
+  constructor(private commerceLocalServ: CommerceLocalService) { }
 
-  ngOnInit(): void {
-    this.locationsService.getLocations().subscribe(data => {
-      this.locationsList = data;
-    });
-
-    this.commerceService.commerces$.subscribe(data => {
-      this.commerceList = data;
-    });
-  }
-
-  onAddCommerce(newCommerce: Commerce): void {
-    this.commerceService.addCommerce(newCommerce);
-  }
-
-  onEditCommerce(commerce: Commerce): void {
+  onEditCommerce(commerce: CommerceResponseEntity): void {
     this.selectedCommerce = commerce;
   }
 
-  onUpdateCommerce(updatedCommerce: Commerce): void {
-    this.commerceService.updateCommerce(updatedCommerce.id, updatedCommerce);
+  onUpdateCommerce(updateCommerce: CommerceUpdateRequestEntity): void {
     this.selectedCommerce = null;
   }
 
-  onDeleteCommerce(id: string): void {
-    this.commerceService.deleteCommerce(id);
+  onDeleteCommerce(id: number): void {
+    const userConfirmed = window.confirm('¿Estás seguro de que deseas eliminar el comercio? Esta accion no se puede deshacer y eliminara todas las transacciones relacionadas a ese NIT');
+    if(userConfirmed) this.commerceLocalServ.onDeleteCommerce(id);
   }
-
-  onAddLocation(newLocation: LocationRequestEntitie): void {
-    this.locationsService.addLocation(newLocation).subscribe(data => {
-      this.locationsList.push(data); // Añade la nueva ubicación recibida del backend a la lista
-    });
-  }
-
 }

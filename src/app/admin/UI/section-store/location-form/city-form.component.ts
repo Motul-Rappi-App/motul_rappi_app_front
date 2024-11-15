@@ -1,8 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LocationRequestEntitie } from '../../../../core/models';
-import { JwtLocalManageService } from '../../../../core/services/jwt-local-manage.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { ToastrService } from 'ngx-toastr';
+import { LocationsLocalService } from '../../../services';
+import { LocalStorageService, LocationService } from '../../../../core/services';
 
 @Component({
   selector: 'app-city-form',
@@ -11,12 +13,16 @@ import { JwtLocalManageService } from '../../../../core/services/jwt-local-manag
   templateUrl: './city-form.component.html',
   styleUrls: ['./city-form.component.css']
 })
-export class CityFormComponent implements OnInit {
+export class CityFormComponent{
 
-  @Output() addLocation = new EventEmitter<LocationRequestEntitie>();
   locationForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private jwtService: JwtLocalManageService) {
+  constructor(private fb: FormBuilder, 
+              private localServ: LocalStorageService,
+              private locationsLocalServ: LocationsLocalService,
+              private _toastServ: ToastrService,
+              private locationServ: LocationService) {
+
     this.locationForm = this.fb.group({
       name: [
         '',
@@ -27,48 +33,30 @@ export class CityFormComponent implements OnInit {
           Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú]+$/) // Al menos una mayúscula, solo letras
         ]
       ],
-      adminId: [
-        null,
-        Validators.required
-      ]
+      adminId: [null]
     });
   }
 
-  ngOnInit(): void {
-    const adminId = this.getAdminIdFromToken();
-    if (adminId) {
-      this.locationForm.patchValue({ adminId });
-      console.log("Admin ID asignado:", adminId);
-    } else {
-      console.warn("Admin ID no encontrado en el token.");
-    }
+  async onSubmit() {
+    this.setAdminIdToForm()
+    if (!this.validateForm()) return;
+
+    const location = await this.locationsLocalServ.saveLocationInDb(this.locationForm.value);
+    
+    this.locationsLocalServ.addLocationToLocalEnvironment( location ); 
+    this.locationForm.reset();    
   }
 
-  private getAdminIdFromToken(): number | null {
-    const token = this.jwtService.tokenFromLocal?.token;
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Token payload completo:', payload);
-        return payload.id || null;
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-        return null;
-      }
-    }
-    console.warn("Token no encontrado en localStorage.");
-    return null;
+  setAdminIdToForm(){
+    const adminId = this.localServ.getAdminIdFromStorage();
+
+    if (adminId) this.locationForm.patchValue({ adminId });
+    else this._toastServ.error('No se pudo obtener el ID del administrador.', 'Error enviando formulario');
   }
 
-  onSubmit(): void {
-    if (this.locationForm.valid) {
-      const newLocation: LocationRequestEntitie = this.locationForm.value;
-
-      console.log('Datos enviados:', JSON.stringify(newLocation, null, 2));
-      this.addLocation.emit(newLocation);
-      this.locationForm.reset();
-    } else {
-      console.log('Formulario inválido', this.locationForm);
-    }
+  private validateForm(): boolean{
+    if (this.locationForm.valid) return true
+    this._toastServ.error('Formulario inválido', 'Error enviando formulario');
+    return false;
   }
 }

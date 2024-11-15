@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { ViscosityResponseEntitie } from '../../../../core/models';
+import { ViscosityResponseEntity } from '../../../../core/models';
+import { ViscositiesLocalService } from '../../../services';
+import { ToastrService } from 'ngx-toastr';
+import { OilReferenceService } from '../../../../core/services';
 
 @Component({
   selector: 'app-viscosities-list',
@@ -22,20 +25,32 @@ import { ViscosityResponseEntitie } from '../../../../core/models';
     ]),
   ],
 })
-export class ViscositiesListComponent {
-  @Input() viscositiesList: ViscosityResponseEntitie[] = [];
-  @Output() addViscosity = new EventEmitter<void>();
+export class ViscositiesListComponent implements OnInit{
 
+  constructor(private viscositiesLocalServ: ViscositiesLocalService,
+              private _toastServ: ToastrService,
+              private oilReferenceServ: OilReferenceService
+  ){}
+
+  viscositiesList: ViscosityResponseEntity[] = [];
   searchTerm: string = '';
   
-  onAddViscosity(): void {
-    this.addViscosity.emit();
+  ngOnInit(): void {
+    this.updateViscosities();
+    this.watchUpdatesInViscosityLocal();
   }
 
-  getFilteredViscosities(): ViscosityResponseEntitie[] {
-    return this.viscositiesList.filter(viscosity =>
-      viscosity.description.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+  updateViscosities(): void {
+    this.oilReferenceServ.getAllViscosities()?.subscribe({
+      next: (locations: ViscosityResponseEntity[]) => this.viscositiesLocalServ.addViscositiesFromDbToLocalList(locations),
+      error: (error: any) => this._toastServ.error('Error cargando las Viscosidades', 'Error de carga')});
   }
 
+  watchUpdatesInViscosityLocal(){
+    this.viscositiesLocalServ.viscositiesLocalList$.subscribe((viscosities: ViscosityResponseEntity[]) => this.viscositiesList = viscosities);
+  }
+
+  getFilteredViscosities() {
+    return this.viscositiesList.filter(viscosity => viscosity.description.toLowerCase().includes(this.searchTerm.toLowerCase()));
+  }
 }

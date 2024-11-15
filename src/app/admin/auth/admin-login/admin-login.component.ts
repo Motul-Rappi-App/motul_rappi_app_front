@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
-import { Router } from '@angular/router';
-import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
-import { environment } from '../../../../environments/environment.development';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+
 import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
+import { environment } from '../../../../environments/environment.development';
+import { LocalStorageService, AuthService, JwtLocalManageService } from '../../../core/services';
+import {  AuthenticationRequestEntity, AuthenticationResponseEntity } from '../../../core/models';
+import { FormsContainerComponent } from '../../../layouts/forms-container/forms-container.component';
+
 
 @Component({
   selector: 'app-admin-login',
@@ -30,11 +31,12 @@ export class AdminLoginComponent implements OnInit {
     private _toast: ToastrService,
     private router: Router,
     private jwtServ: JwtLocalManageService,
+    private localServ: LocalStorageService,
     private authServ: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(9), Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")]]
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100), Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")]]
     });
   }
 
@@ -69,7 +71,7 @@ export class AdminLoginComponent implements OnInit {
   }
 
   sendFormToValidateCredentials(){
-    const authRequest: AuthenticationRequestEntitie = {
+    const authRequest: AuthenticationRequestEntity = {
       email: this.loginForm.get('email')?.value,
       password: this.loginForm.get('password')?.value
     }
@@ -98,8 +100,10 @@ export class AdminLoginComponent implements OnInit {
     this._toast.error('Error iniciando sesión', errorToShow, environment.TOAST_CONFIG);
   }
 
-  successLogin(data: AuthenticationResponseEntitie){
+  successLogin(data: AuthenticationResponseEntity){
     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+    
+    this.localServ.setCredentialsToLocal(data);
     this.jwtServ.setTokenToLocal(data.token);
     this.router.navigate(['/admin/lobby-admin']);
   }

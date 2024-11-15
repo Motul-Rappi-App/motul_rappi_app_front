@@ -1,3 +1,3 @@
-export * from './CommerceRequest.entitie';
-export * from './CommerceResponse.entitie';
-export * from './CommerceUpdateRequest.entitie';
+export * from './CommerceRequest.entity';
+export * from './CommerceResponse.entity';
+export * from './CommerceUpdateRequest.entity';

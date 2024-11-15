@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" *ngIf="selectedCommerce == null">
         <label for="email" class="block text-gray-400 text-sm font-bold mb-2">Correo Electrónico</label>
         <input id="email" formControlName="email" type="email" placeholder="Introduce el correo electrónico"
             class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
@@ -55,6 +55,7 @@
         <select id="cities" formControlName="cities"
             class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
             <option *ngIf="filteredCities().length === 0" disabled>No hay ciudades disponibles</option>
+            <option invalid selected>No ha seleccionado ciudad</option>
             <option *ngFor="let city of filteredCities()" [value]="city.id">
                 {{ city.name }}
             </option>

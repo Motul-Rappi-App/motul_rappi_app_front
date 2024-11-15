@@ -7,7 +7,7 @@ import { FormsContainerComponent } from "../../../layouts/forms-container/forms-
 import { Router } from '@angular/router';
 import { JwtLocalManageService } from '../../../core/services/jwt-local-manage.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { AuthenticationRequestEntitie, AuthenticationResponseEntitie } from '../../../core/models';
+import { AuthenticationRequestEntity, AuthenticationResponseEntity } from '../../../core/models';
 import { environment } from '../../../../environments/environment.development';
 import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
 
@@ -61,7 +61,7 @@ export class UserLoginComponent {
   }
 
   sendFormToValidateCredentials(){
-    const authRequest: AuthenticationRequestEntitie = {
+    const authRequest: AuthenticationRequestEntity = {
       email: this.loginForm.get('email')?.value,
       password: this.loginForm.get('password')?.value
     }
@@ -91,7 +91,7 @@ export class UserLoginComponent {
     this._toast.error('Error iniciando sesión', errorToShow, environment.TOAST_CONFIG);
   }
 
-  successLogin(data: AuthenticationResponseEntitie){
+  successLogin(data: AuthenticationResponseEntity){
     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
     this.jwtServ.setTokenToLocal(data.token);
     this.router.navigate(['/commerce/lobby']);
