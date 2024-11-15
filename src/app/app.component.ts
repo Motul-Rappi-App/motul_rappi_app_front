@@ -11,5 +11,6 @@ import { PrincipalLayoutComponent } from './layouts/principal-layout/principal-l
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  
   title = 'promorappimotul';
 }
