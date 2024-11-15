@@ -3,19 +3,19 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../../environments/environment.development';
-import { LocationRequestEntitie } from '../../../../core/models';
+import { LocationRequestEntity } from '../../../../core/models';
 import { JwtLocalManageService } from '../../../../core/services/jwt-local-manage.service';
 
 @Component({
-  selector: 'app-location-form',
+  selector: 'app-city-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule,],
-  templateUrl: './location-form.component.html',
-  styleUrls: ['./location-form.component.css']
+  templateUrl: './city-form.component.html',
+  styleUrls: ['./city-form.component.css']
 })
-export class LocationFormComponent {
+export class CityFormComponent {
 
-  @Output() addLocation = new EventEmitter<LocationRequestEntitie>();
+  @Output() addLocation = new EventEmitter<LocationRequestEntity>();
   locationForm: FormGroup;
 
   constructor(
@@ -39,7 +39,7 @@ export class LocationFormComponent {
 
   onSubmit(): void {
     if (this.locationForm.valid) {
-      const newLocation: LocationRequestEntitie = this.locationForm.value;
+      const newLocation: LocationRequestEntity = this.locationForm.value;
 
       const location = {
         name: newLocation.name,

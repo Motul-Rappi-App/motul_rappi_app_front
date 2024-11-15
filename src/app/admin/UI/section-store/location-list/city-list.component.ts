@@ -8,13 +8,13 @@ import { LocationResponseEntity } from '../../../../core/models';
 
 
 @Component({
-  selector: 'app-location-list',
+  selector: 'app-city-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './location-list.component.html',
-  styleUrl: './location-list.component.css'
+  templateUrl: './city-list.component.html',
+  styleUrl: './city-list.component.css'
 })
-export class LocationListComponent {
+export class CityListComponent {
 
   constructor(private locationsServ: LocationService,
               private _toastServ: ToastrService,
