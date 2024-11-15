@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { ToastrService } from 'ngx-toastr';
 import { CommerceLocalService } from '../../../services';
 import { CommerceService } from '../../../../core/services';
 import { CommerceResponseEntity } from '../../../../core/models';
-
 
 @Component({
   selector: 'app-commerce-list',
@@ -15,7 +14,7 @@ import { CommerceResponseEntity } from '../../../../core/models';
   templateUrl: './commerce-list.component.html',
   styleUrl: './commerce-list.component.css'
 })
-export class CommerceListComponent {
+export class CommerceListComponent implements OnInit {
 
   searchTerm: string = '';
   commerceList: CommerceResponseEntity[] = [];

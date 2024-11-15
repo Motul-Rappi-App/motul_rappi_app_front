@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -7,8 +6,6 @@ import { ToastrService } from 'ngx-toastr';
 import { CommercesMapperService } from '../../../../core/helpers';
 import { CommerceLocalService, LocationsLocalService } from '../../../services';
 import { CommerceRequestEntity, CommerceResponseEntity, LocationResponseEntity } from '../../../../core/models';
-import { LocationService } from '../../../../core/services';
-
 
 @Component({
   selector: 'app-commerce-form',
@@ -31,10 +28,21 @@ export class CommerceFormComponent {
     private commerceLocalServ: CommerceLocalService,
     private locationsLocalServ: LocationsLocalService,
     private _toastServ: ToastrService,
-    private commerceMapperServ: CommercesMapperService,
-    private locationServ: LocationService
+    private commerceMapperServ: CommercesMapperService
   ) {
     this.commerceForm = this.fb.group({
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+          Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚ0-9 ]+$'),
+          this.commerceLocalServ.noWhitespaceValidator,
+          this.commerceLocalServ.noConsecutiveCharactersValidator,
+          this.commerceLocalServ.noOnlyNumbersValidator,
+        ]
+      ],
       cities: [[], Validators.required],
       nit: ['', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(5), Validators.maxLength(20)]],
       email: [''],
@@ -42,17 +50,11 @@ export class CommerceFormComponent {
         '',
         [
           Validators.required,
-          Validators.pattern(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{8,}$/)  // PASSWORD_REGEX
+          Validators.minLength(8),
+          Validators.maxLength(20),
+          Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')
         ]
       ],
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?=.*[A-Z])[A-Za-zÁÉÍÓÚáéíóú0-9]{1,50}$/)  // NAME_REGEX
-        ]
-      ],
-      locationId: ['', Validators.required],
     });
   }
 
@@ -94,17 +96,9 @@ export class CommerceFormComponent {
     return true
   }
 
-    
   private resetForm(): void {
     this.commerceForm.reset();
     this.selectedCommerce = null;
-  }
-
-
-  loadLocations(): void {
-    this.locationServ.getAllLocations()?.subscribe(data => {
-      this.citiesList = data;
-    });
   }
 
   watchCitiesChanges(){

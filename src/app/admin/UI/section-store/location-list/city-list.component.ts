@@ -6,7 +6,6 @@ import { LocationsLocalService } from '../../../services';
 import { LocationService } from '../../../../core/services';
 import { LocationResponseEntity } from '../../../../core/models';
 
-
 @Component({
   selector: 'app-city-list',
   standalone: true,

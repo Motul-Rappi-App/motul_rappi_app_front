@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ViscositiesLocalService } from '../../../services/viscosities-local.service';
 import { CommonModule } from '@angular/common';
-import { OilReferenceResponseEntity, ViscosityResponseEntity } from '../../../../core/models';
+import { OilReferenceRequestEntity, OilReferenceResponseEntity, ViscosityRequestEntity, ViscosityResponseEntity } from '../../../../core/models';
 import { ToastrService } from 'ngx-toastr';
 import { OilReferenceUpdateRequestEntity } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entity';
+import { environment } from '../../../../../environments/environment.development';
 import { OilsLocalService } from '../../../services/oils-local.service';
 import { OilReferencesMapperService } from '../../../../core/helpers/mappers/oil-references-mapper.service';
 

@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { OilsListComponent } from "./oils-list/oils-list.component";
 import { ViscositiesListComponent } from "./viscosities-list/viscosities-list.component";
 import { OilsLocalService } from '../../services/oils-local.service';
+import { ViscositiesLocalService } from '../../services/viscosities-local.service';
 import { OilFormComponent } from './oil-form/oil-form.component';
 import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.component';
-import {  OilReferenceResponseEntity, ViscosityResponseEntity } from '../../../core/models';
+import { OilReferenceRequestEntity, OilReferenceResponseEntity, ViscosityRequestEntity, ViscosityResponseEntity } from '../../../core/models';
 import { OilReferenceUpdateRequestEntity } from '../../../core/models/oilReference/OilReferenceUpdateRequest.entity';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment.development';
@@ -24,6 +25,7 @@ export class SectionProductsComponent{
 
   constructor(
     private oilsLocalService: OilsLocalService,
+    private viscositiesLocalService: ViscositiesLocalService,
   ) { }
 
 
