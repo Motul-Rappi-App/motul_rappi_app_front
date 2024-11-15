@@ -4,6 +4,8 @@ import { CommerceLocalService } from '../../services';
 import { CommerceFormComponent } from './commerce-form/commerce-form.component';
 import { CommerceListComponent } from './commerce-list/commerce-list.component';
 import {  CommerceResponseEntity, CommerceUpdateRequestEntity, LocationResponseEntity } from '../../../core/models';
+import { LocationFormComponent } from './location-form/location-form.component';
+import { LocationListComponent } from './location-list/location-list.component';
 
 
 @Component({
