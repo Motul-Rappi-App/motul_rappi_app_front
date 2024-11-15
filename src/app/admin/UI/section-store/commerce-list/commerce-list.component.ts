@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommerceResponseEntitie, LocationResponseEntitie } from '../../../../core/models';
+import { Component, EventEmitter, Output } from '@angular/core';
+
+import { ToastrService } from 'ngx-toastr';
+import { CommerceLocalService } from '../../../services';
+import { CommerceService } from '../../../../core/services';
+import { CommerceResponseEntity } from '../../../../core/models';
+
 
 @Component({
   selector: 'app-commerce-list',
@@ -12,28 +17,44 @@ import { CommerceResponseEntitie, LocationResponseEntitie } from '../../../../co
 })
 export class CommerceListComponent {
 
-  @Input() commerceList: CommerceResponseEntitie[] = [];
-  @Output() editCommerce = new EventEmitter<CommerceResponseEntitie>();
+  searchTerm: string = '';
+  commerceList: CommerceResponseEntity[] = [];
+  @Output() editCommerce = new EventEmitter<CommerceResponseEntity>();
   @Output() deleteCommerce = new EventEmitter<number>();
 
-  locationList: LocationResponseEntitie[] = [];
 
-  searchTerm: string = '';
+  constructor(
+    private commerceLocalServ: CommerceLocalService,
+    private commerceServ: CommerceService,
+    private _toastServ: ToastrService
+  ) { }
 
-  getFilteredCommerces(): CommerceResponseEntitie[] {
+  ngOnInit(): void {
 
-    if (!this.searchTerm.trim()) {
-      return this.commerceList;
-    }
-
-    const lowerSearchTerm = this.searchTerm.toLowerCase();
-    return this.commerceList.filter(commerce =>
-      commerce.name.toLowerCase().includes(lowerSearchTerm)
-    );
+    this.updateCommerces()
+    this.watchUpdatesInCommercesLocal()
   }
 
-  onEdit(commerce: CommerceResponseEntitie): void {
-    this.editCommerce.emit(commerce);
+  updateCommerces(){
+    this.commerceServ.getAllCommerces()?.subscribe({
+      next: (commerces: CommerceResponseEntity[]) => this.commerceLocalServ.addCommercesToLocalEnvironment(commerces),
+      error: (error: any) => this._toastServ.error('Error cargando los comercios' + error.error, 'Error de carga')
+    });
+  }
+
+   getFilteredCommerces(): CommerceResponseEntity[] {
+
+    if (!this.searchTerm.trim()) return this.commerceList;
+    const lowerSearchTerm = this.searchTerm.toLowerCase();
+    return this.commerceList.filter(commerce => commerce.name.toLowerCase().includes(lowerSearchTerm) );
+  }
+
+  watchUpdatesInCommercesLocal(){
+    this.commerceLocalServ.commercesLocalList$.subscribe((commerces: CommerceResponseEntity[]) => this.commerceList = commerces);
+  }
+
+  onEdit(commmerce: CommerceResponseEntity): void {
+    this.editCommerce.emit(commmerce);
   }
 
   onDelete(id: number): void {

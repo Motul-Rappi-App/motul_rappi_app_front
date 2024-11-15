@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { OilsListComponent } from "./oils-list/oils-list.component";
 import { ViscositiesListComponent } from "./viscosities-list/viscosities-list.component";
-import { OilsService } from '../../services/oils.service';
-import { ViscositiesService } from '../../services/viscosities.service';
+import { OilsLocalService } from '../../services/oils-local.service';
 import { OilFormComponent } from './oil-form/oil-form.component';
 import { ViscositiesFormComponent } from './viscosities-form/viscosities-form.component';
-import { OilReferenceRequestEntitie, OilReferenceResponseEntitie, ViscosityRequestEntitie, ViscosityResponseEntitie } from '../../../core/models';
-import { OilReferenceUpdateRequestEntitie } from '../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
+import {  OilReferenceResponseEntity, ViscosityResponseEntity } from '../../../core/models';
+import { OilReferenceUpdateRequestEntity } from '../../../core/models/oilReference/OilReferenceUpdateRequest.entity';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment.development';
 
@@ -17,63 +16,29 @@ import { environment } from '../../../../environments/environment.development';
   templateUrl: './section-products.component.html',
   styleUrl: './section-products.component.css'
 })
-export class SectionProductsComponent implements OnInit {
+export class SectionProductsComponent{
 
-  oilsList: OilReferenceResponseEntitie[] = [];
-  viscositiesList: ViscosityResponseEntitie[] = [];
-  selectedOil: OilReferenceResponseEntitie | null = null;
+  oilsList: OilReferenceResponseEntity[] = [];
+  viscositiesList: ViscosityResponseEntity[] = [];
+  selectedOil: OilReferenceResponseEntity | null = null;
 
   constructor(
-    private oilsService: OilsService,
-    private viscositiesService: ViscositiesService,
-    private _toast: ToastrService,
+    private oilsLocalService: OilsLocalService,
   ) { }
 
-  ngOnInit(): void {
 
-    this.oilsService.getOils().subscribe(data => {
-      this.oilsList = data;
-    });
 
-    this.viscositiesService.getViscosities().subscribe(data => {
-      this.viscositiesList = data;
-    });
+  onEditOil(oil: OilReferenceResponseEntity): void {
+    this.selectedOil = oil;
   }
 
-  onAddOil(newOil: OilReferenceRequestEntitie): void {
-    this.oilsService.addOil(newOil).subscribe(data => {
-      this.oilsList.push(data);
-    });
-  }  
-
-  onEditOil(oil: OilReferenceUpdateRequestEntitie): void {
-    this.selectedOil = {
-      ...this.selectedOil,
-      ...oil
-    } as unknown as OilReferenceResponseEntitie;
-  }
-
-  onUpdateOil(updateOil: OilReferenceUpdateRequestEntitie): void {
-    this.oilsService.updateOil(updateOil).subscribe(() => {
-      this.oilsService.getOils().subscribe(data => {
-        this.oilsList = data;
-      });
-      this.selectedOil = null;
-    });
+  onUpdateOil(updateOil: OilReferenceUpdateRequestEntity): void {
+    this.selectedOil = null;
   }
 
   onDeleteOil(id: number): void {
-    this.oilsService.deleteOil(id).subscribe(() => {
-      this.oilsService.getOils().subscribe(data => {
-        this.oilsList = data;
-      });
-    });
-  }
-
-  onAddViscosity(newViscosity: ViscosityRequestEntitie): void { 
-    this.viscositiesService.addViscosity(newViscosity).subscribe(data => {
-      this._toast.success('Viscosidad agregada correctamente', 'Exito',  environment.TOAST_CONFIG);
-      this.viscositiesList.push(data);
-    });
+    const userConfirmed = window.confirm('¿Estás seguro de que deseas eliminar el aceite? Esta acción no se puede deshacer y eliminará todas las transacciones relacionadas a esa referencia de aceite');
+    if(userConfirmed) this.oilsLocalService.onDeleteOil(id);
+    this.selectedOil = null;
   }
 }

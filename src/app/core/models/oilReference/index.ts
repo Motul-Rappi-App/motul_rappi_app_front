@@ -1,2 +1,3 @@
-export * from './OilReferenceRequest.entitie';
-export * from './OilReferenceResponse.entitie';
+export * from './OilReferenceRequest.entity';
+export * from './OilReferenceResponse.entity';
+export * from './OilReferenceUpdateRequest.entity'

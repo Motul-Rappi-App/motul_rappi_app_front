@@ -1,7 +1,10 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ViscosityRequestEntitie } from '../../../../core/models';
+import { ViscosityRequestEntity } from '../../../../core/models';
+import { ViscositiesLocalService } from '../../../services';
+import { ToastrService } from 'ngx-toastr';
+import { LocalStorageService } from '../../../../core/services';
 
 @Component({
   selector: 'app-viscosities-form',
@@ -11,11 +14,13 @@ import { ViscosityRequestEntitie } from '../../../../core/models';
   styleUrl: './viscosities-form.component.css'
 })
 export class ViscositiesFormComponent {
-  @Output() addViscosity = new EventEmitter<ViscosityRequestEntitie>();
-
   viscosityForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+              private viscosityLocalServ: ViscositiesLocalService,
+              private _toastServ: ToastrService,
+              private localServ: LocalStorageService
+  ) {
     this.viscosityForm = this.fb.group({
       description: [
         '',
@@ -24,41 +29,35 @@ export class ViscositiesFormComponent {
           Validators.minLength(3),
           Validators.maxLength(50),
           Validators.pattern('^[a-zA-Z0-9 ]+$'),
-          this.noWhitespaceValidator,
-          this.noConsecutiveCharactersValidator,
-          this.noOnlyNumbersValidator,
+          this.viscosityLocalServ.noWhitespaceValidator,
+          this.viscosityLocalServ.noConsecutiveCharactersValidator,
+          this.viscosityLocalServ.noOnlyNumbersValidator,
         ]
-      ]
+      ],
+      adminId: [null]
     });
   }
 
-  noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
-    const isWhitespace = (control.value || '').trim().length === 0;
-    return isWhitespace ? { whitespace: true } : null;
-  }
+  async onSubmit(){
+    this.setAdminIdToForm()
+    if (!this.validateForm()) return;
 
-  noConsecutiveCharactersValidator(control: AbstractControl): ValidationErrors | null {
-    const regex = /(.)\1{2,}/; 
-    return regex.test(control.value) ? { consecutiveCharacters: true } : null;
-  }
-
-  noOnlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
-    return /^[0-9]+$/.test(control.value) ? { onlyNumbers: true } : null;
-  }
-
-  onSubmit(): void {
-    if (this.viscosityForm.valid) {
-      const newViscosity: ViscosityRequestEntitie = this.viscosityForm.value;
-    
-      const viscosity = {
-        description: newViscosity.description,
-        adminId: 1
-      }
-
-      this.addViscosity.emit(viscosity);
+      const newViscosity = await this.viscosityLocalServ.saveViscosityInDb(this.viscosityForm.value);
+      this.viscosityLocalServ.addViscocityToLocalEnvironment(newViscosity);
       this.viscosityForm.reset();
-    } else {
-      console.log('Formulario inválido', this.viscosityForm);
-    }
   }
+
+  setAdminIdToForm(){
+    const adminId = this.localServ.getAdminIdFromStorage();
+
+    if (adminId) this.viscosityForm.patchValue({ adminId });
+    else this._toastServ.error('No se pudo obtener el ID del administrador.', 'Error enviando formulario');
+  }
+
+  private validateForm(): boolean{
+    if(this.viscosityForm.valid) return true
+    this._toastServ.error('Formulario inválido', 'Error enviando formulario');
+    return false;
+  }
+
 }

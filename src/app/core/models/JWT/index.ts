@@ -1,1 +1,1 @@
-export * from './jwt.model';
+export * from './jwt.entity';

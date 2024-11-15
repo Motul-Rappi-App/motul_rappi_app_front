@@ -1,3 +1,3 @@
-export * from './LocationRequest.entitie';
-export * from './LocationResponse.entitie';
-export * from './LocationUpdateRequest.entitie';
+export * from './LocationRequest.entity';
+export * from './LocationResponse.entity';
+export * from './LocationUpdateRequest.entity';

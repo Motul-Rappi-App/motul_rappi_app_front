@@ -2,8 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { OilReferenceResponseEntitie, ViscosityResponseEntitie } from '../../../../core/models';
-import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entitie';
+import { OilReferenceResponseEntity, ViscosityResponseEntity } from '../../../../core/models';
+import { OilReferenceUpdateRequestEntity } from '../../../../core/models/oilReference/OilReferenceUpdateRequest.entity';
+import { OilsLocalService } from '../../../services';
+import { OilReferenceService } from '../../../../core/services/oil-reference.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-oils-list',
@@ -25,41 +28,46 @@ import { OilReferenceUpdateRequestEntitie } from '../../../../core/models/oilRef
 })
 export class OilsListComponent {
 
-  @Input() oilsList: OilReferenceResponseEntitie[] = [];
-  @Output() addOil = new EventEmitter<void>();
-  @Output() editOil = new EventEmitter<OilReferenceUpdateRequestEntitie>();
+  searchTerm: string = '';
+  oilsList: OilReferenceResponseEntity[] = [];
+  @Output() editOil = new EventEmitter<OilReferenceResponseEntity>();
   @Output() deleteOil = new EventEmitter<number>();
 
-  searchTerm: string = '';
-  viscositiesMap: { [id: string]: string } = {};
+  constructor(private oilsReferenceLocalServ: OilsLocalService,
+              private oilReferenceServ: OilReferenceService,
+              private _toastServ: ToastrService
+  ){}
 
-  getFilteredOils(): OilReferenceResponseEntitie[] {
+
+  ngOnInit(): void {
+    this.updateOilReferences()
+    this.watchUpdatesInOilReferencesLocal()
+  }
+
+  updateOilReferences(){
+    this.oilReferenceServ.getAllOilReferences()?.subscribe({
+      next: (commerces: OilReferenceResponseEntity[]) => this.oilsReferenceLocalServ.addOilReferencesToLocalEnvironment(commerces),
+      error: (error: any) => this._toastServ.error('Error cargando los comercios' + error.error, 'Error de carga')
+    });
+  }
+
+
+  getFilteredOils(): OilReferenceResponseEntity[] {
     return this.oilsList.filter(oil =>
       oil.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
-  getViscosityNames(viscosities: ViscosityResponseEntitie[]): string {
+  getViscosityNames(viscosities: ViscosityResponseEntity[]): string {
     return viscosities.map(viscosity => viscosity.description).join(', ');
   }
 
-
-  onEdit(oil: OilReferenceResponseEntitie): void {
-    if (oil.viscosities) {
-      const oilUpdateRequest: OilReferenceUpdateRequestEntitie = {
-        id: oil.id,
-        name: oil.name,
-        viscosities: oil.viscosities.map(viscosity => viscosity.id),
-      };
-      this.editOil.emit(oilUpdateRequest);
-      
-    } else {
-      console.error("La viscosidad no existe!");
-    }
+  watchUpdatesInOilReferencesLocal(){
+    this.oilsReferenceLocalServ.oilReferencesLocalList$.subscribe((oils: OilReferenceResponseEntity[]) => this.oilsList = oils);
   }
 
-  onAddOil(): void {
-    this.addOil.emit();
+  onEdit(oil: OilReferenceResponseEntity): void {
+    this.editOil.emit(oil);
   }
 
   onDelete(id: number): void {

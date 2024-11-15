@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { ToastrService } from 'ngx-toastr';
-import { CommerceRequestEntitie, CommerceUpdateRequestEntitie, LocationResponseEntitie } from '../../../../core/models';
-import { LocationsService } from '../../../services/locations.service';
+import { CommercesMapperService } from '../../../../core/helpers';
+import { CommerceLocalService, LocationsLocalService } from '../../../services';
+import { CommerceRequestEntity, CommerceResponseEntity, LocationResponseEntity } from '../../../../core/models';
+import { LocationService } from '../../../../core/services';
+
 
 @Component({
   selector: 'app-commerce-form',
@@ -14,35 +19,25 @@ import { LocationsService } from '../../../services/locations.service';
 })
 export class CommerceFormComponent {
 
-  @Input() locationsList: LocationResponseEntitie[] = [];
-  @Input() selectedCommerce: CommerceUpdateRequestEntitie | null = null;
-  @Output() addCommerce = new EventEmitter<CommerceRequestEntitie>();
-  @Output() updateCommerce = new EventEmitter<CommerceUpdateRequestEntitie>();
+  @Input() selectedCommerce: CommerceResponseEntity | null = null;
+  @Output() updateCommerce = new EventEmitter<CommerceRequestEntity>();
 
   commerceForm: FormGroup;
+  citiesList: LocationResponseEntity[] = [];
+  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private _toast: ToastrService,
-    private locationsService: LocationsService
+    private commerceLocalServ: CommerceLocalService,
+    private locationsLocalServ: LocationsLocalService,
+    private _toastServ: ToastrService,
+    private commerceMapperServ: CommercesMapperService,
+    private locationServ: LocationService
   ) {
     this.commerceForm = this.fb.group({
-      nit: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(1),
-          Validators.maxLength(20),
-          Validators.pattern(/^[0-9]{9,12}$/)  // NIT_REGEX
-        ]
-      ],
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.email
-        ]
-      ],
+      cities: [[], Validators.required],
+      nit: ['', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(5), Validators.maxLength(20)]],
+      email: [''],
       password: [
         '',
         [
@@ -62,48 +57,75 @@ export class CommerceFormComponent {
   }
 
   ngOnInit(): void {
-    this.loadLocations();
+    this.watchCitiesChanges();
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedCommerce'] && this.selectedCommerce) this.setFormValuesToUpdate(this.selectedCommerce)
   }
 
-  ngOnChanges(): void {
-    if (this.selectedCommerce) {
-      this.commerceForm.patchValue(this.selectedCommerce);
-      // Deshabilita el campo de correo si se está editando
-      this.commerceForm.get('email')?.disable();
-    } else {
-      this.commerceForm.reset();
-      // Habilita el campo de correo si se está añadiendo un nuevo comercio
-      this.commerceForm.get('email')?.enable();
+
+  private setFormValuesToUpdate(selectedCommerce: CommerceResponseEntity): void {
+
+    const commerceToUpd = this.commerceMapperServ.commerceFromObjectToUpdate(selectedCommerce.id, selectedCommerce, this.commerceForm.value.password);
+    if(commerceToUpd) this.commerceForm.patchValue(commerceToUpd);
+  }
+
+  async onSubmit(){
+
+    if(!this.isValidForm()) return;
+
+    if (this.selectedCommerce) this.commerceLocalServ.updateCommerceInDB(this.selectedCommerce.id, this.commerceForm.value, this.commerceForm.value.password);
+    else await this.createCommerce()
+    this.resetForm();
+  }
+
+  async createCommerce(){
+
+    const commerceData = this.commerceMapperServ.commerceFromFormToRequest(this.commerceForm);
+    if (commerceData) await this.commerceLocalServ.saveCommerceInDBAndLocal(commerceData);
+  }
+
+  private isValidForm(): boolean {
+    if(this.commerceForm.invalid){
+      this._toastServ.error('Por favor complete el formulario', 'Error en formulario');
+      return false;
     }
+    return true
+  }
+
+    
+  private resetForm(): void {
+    this.commerceForm.reset();
+    this.selectedCommerce = null;
   }
 
 
   loadLocations(): void {
-    this.locationsService.getLocations().subscribe(data => {
-      this.locationsList = data;
+    this.locationServ.getAllLocations()?.subscribe(data => {
+      this.citiesList = data;
     });
   }
 
-  onSubmit(): void {
-    if (this.commerceForm.valid) {
-      const commerceData = this.commerceForm.value;
-      if (this.selectedCommerce) {
-        // Updating an existing commerce
-        this.updateCommerce.emit({ ...this.selectedCommerce, ...commerceData });
-        this._toast.success('Comercio actualizado', 'Éxito');
-      } else {
-        // Adding a new commerce
-        const newCommerce: CommerceRequestEntitie = {
-          ...commerceData,
-          adminId: 1  // Valor quemado según requerimiento
-        };
-        this.addCommerce.emit(newCommerce);
-        this._toast.success('Comercio añadido', 'Éxito');
-      }
-      this.commerceForm.reset();
-    } else {
-      this._toast.error('Formulario inválido', 'Error');
-    }
+  watchCitiesChanges(){
+    this.locationsLocalServ.locationsLocalList$.subscribe((locationsFromLocal:LocationResponseEntity[]) => this.citiesList = locationsFromLocal )
   }
 
+  filteredCities(): LocationResponseEntity[] {
+    return this.citiesList.filter(city =>
+      city.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  get name() {
+    return this.commerceForm.get('name');
+  }
+
+  get formTitle(): string {
+    return this.selectedCommerce ? 'Editar Comercio' : 'Añadir Comercio';
+  }
+
+  get submitButtonText(): string {
+    return this.selectedCommerce ? 'Actualizar Comercio' : 'Añadir Comercio';
+  }
 }

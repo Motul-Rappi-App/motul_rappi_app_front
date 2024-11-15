@@ -25,10 +25,8 @@
           <span *ngIf="commerceForm.get('nit')?.errors?.['required']">{{ 'El NIT del comercio no puede ser nulo o vacío' }}</span>
           <span *ngIf="commerceForm.get('nit')?.errors?.['pattern']">{{ 'El NIT del comercio no es válido' }}</span>
         </div>
-      </div>
-  
-      <!-- Campo Correo Electrónico -->
-      <div class="mb-4">
+    </div>
+    <div class="mb-4" *ngIf="selectedCommerce == null">
         <label for="email" class="block text-gray-400 text-sm font-bold mb-2">Correo Electrónico</label>
         <input id="email" formControlName="email" type="email" placeholder="Introduce el correo electrónico"
                class="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" />
@@ -47,15 +45,18 @@
           <span *ngIf="commerceForm.get('password')?.errors?.['required']">{{ 'La contraseña del comercio no puede ser nula o vacía' }}</span>
           <span *ngIf="commerceForm.get('password')?.errors?.['pattern']">{{ 'La contraseña del comercio debe incluir al menos una mayúscula, una minúscula, un número y no puede contener espacios en blanco' }}</span>
         </div>
-      </div>
-  
-      <!-- Campo Ciudad -->
-      <div class="mb-4">
-        <label for="locationId" class="block text-gray-400 text-sm font-bold mb-2">Ciudad</label>
-        <select id="locationId" formControlName="locationId"
-                class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
-          <option value="" disabled selected>Seleccione una ciudad</option>
-          <option *ngFor="let location of locationsList" [value]="location.id">{{ location.name }}</option>
+
+    </div>
+
+    <div class="mb-4">
+        <label for="cities" class="block text-gray-400 text-sm font-bold mb-2">Ciudad</label>
+        <select id="cities" formControlName="cities"
+            class="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-gray-500 focus:border-blue-500 block w-full p-2.5">
+            <option *ngIf="filteredCities().length === 0" disabled>No hay ciudades disponibles</option>
+            <option invalid selected>No ha seleccionado ciudad</option>
+            <option *ngFor="let city of filteredCities()" [value]="city.id">
+                {{ city.name }}
+            </option>
         </select>
         <div *ngIf="commerceForm.get('locationId')?.invalid && (commerceForm.get('locationId')?.dirty || commerceForm.get('locationId')?.touched)" class="text-red-500 text-sm mt-1">
           {{ 'La ubicación del comercio no puede ser nula' }}
