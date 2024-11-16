@@ -23,7 +23,7 @@ export class AdminLoginComponent implements OnInit {
 
   loginForm: FormGroup;
   captchaResolved: boolean = false;
-  recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
+  recaptchaSiteKey: string = environment.CAPTCHA_KEY; 
   isLoading: boolean = false;
 
   constructor(

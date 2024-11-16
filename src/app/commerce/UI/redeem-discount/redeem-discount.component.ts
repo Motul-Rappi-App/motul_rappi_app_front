@@ -5,6 +5,10 @@ import { FormsContainerComponent } from '../../../layouts/forms-container/forms-
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { SpinnerComponent } from '../../../shared/spinner/spinner.component';
+import { environment } from '../../../../environments/environment.development';
+import { ValidatePromotionRequestEntity, ValidatePromotionResponseEntity } from '../../../core/models';
+import { PromotionalValidationService } from '../../../core/services';
+import { ParseErrorService } from '../../../core/helpers/parse-error.service';
 
 @Component({
   selector: 'app-redeem-discount',
@@ -21,51 +25,67 @@ export class RedeemDiscountComponent {
   constructor(
     private fb: FormBuilder,
     private _toast: ToastrService,
-    private router: Router
+    private router: Router,
+    private validateServ: PromotionalValidationService,
+    private parseErrorServ: ParseErrorService
   ) {
     this.redeemForm = this.fb.group({
-      cedula: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(8)]],
+      identification: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(4)]],
     });
+  }
+
+  ngOnInit(): void {
+    window.addEventListener('popstate', () => {
+      history.pushState(null, '', window.location.href);
+    });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('popstate', () => {})
   }
 
   onSubmit() {
     this.isLoading = true;
-    if (this.redeemForm.valid) {
-      const cedulaValue = this.getCedula?.value || '';
-  
-      // Llamada a la función de validación de cédula (simulada)
-      this.validateCedula(cedulaValue).then(isValid => {
+    if(!this.isValidForm()) return;
 
-        const message = isValid 
-          ? '¡La cédula es válida!' 
-          : '¡La cédula es inválida o no está registrada en el sistema!';
+    const identificationRequest: ValidatePromotionRequestEntity = {identification: this.getIdentification?.value || ''}
 
-
-        // Redirigimos al componente feedback-discount con el estado
+    this.validateIdentificationPromise(identificationRequest)?.then((validateResponse: ValidatePromotionResponseEntity) => {
+        if(validateResponse) this.successValidation(validateResponse);
+      }).catch((error) => {
         this.isLoading = false;
-        this.router.navigate(['/commerce/feedback'], { 
-          state: { cedula: cedulaValue, valid: isValid, message: message }
-        });
-      });
-    } else {
-      this.isLoading = false;
-      this._toast.error('Formulario inválido', 'Error al verificar', {
-        timeOut: 3000,
-        progressBar: true,
-      });
-    }
+      })
   }  
 
-  validateCedula(cedula: string): Promise<boolean> {
-    // Simulación de la validación de cédula
-    // Supongamos que una cédula válida para la promoción es aquella que empieza con 1
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(cedula.startsWith('1')); // Simulamos que las cédulas que empiezan con '1' son válidas
-      }, 1000); // Simulamos un retraso de 1 segundo
-    });
+  isValidForm(): boolean{
+    if(this.redeemForm.valid) return true
+
+    this.isLoading = false;
+    this._toast.error('Formulario inválido', 'Ingrese una Identification Valida');
+    return false;
   }
 
-  get getCedula() { return this.redeemForm.get('cedula'); }
+  private successValidation(validationResponse: ValidatePromotionResponseEntity): void {
+    this.isLoading = false;
+    this.router.navigate(['/commerce/feedback'], {state: validationResponse, replaceUrl: true});
+  }
+
+  private validateIdentificationPromise(identification: ValidatePromotionRequestEntity): Promise<ValidatePromotionResponseEntity> | null {
+
+    return new Promise((resolve, reject) => {
+
+      this.validateServ.validatePromotion(identification)?.subscribe({
+        next: (response: ValidatePromotionResponseEntity) => {
+          resolve(response);
+        },
+        error: (error) => {
+          this._toast.error(this.parseErrorServ.parseErrorFromBackend(error), 'Error en la validacion');
+          reject(null);
+        }
+      });
+    })
+  }
+
+  get getIdentification() { return this.redeemForm.get('identification'); }
 
 }

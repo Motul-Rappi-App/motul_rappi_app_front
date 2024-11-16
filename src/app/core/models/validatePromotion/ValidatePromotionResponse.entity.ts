@@ -1,7 +1,7 @@
 import { RappiCourierResponseEntity } from "../rappiCourier";
 
 export interface ValidatePromotionResponseEntity {
-    isValidPromotion: boolean;
+    validPromotion: boolean;
     messageInformation: string;
     doRegisterIn: string | null;
     rappiCourierDto: RappiCourierResponseEntity | null;

@@ -1,11 +1,5 @@
 <div class="min-h-screen flex flex-col items-center justify-center p-8 text-gray-100">
-  <!-- Si la cédula es válida, muestra el componente ValidPromotionComponent -->
-  <div *ngIf="isValid; else invalid">
-    <app-valid-promotion [cedula]="cedula" [message]="message"></app-valid-promotion>
+  <div>
+    <app-valid-promotion [promotionInformation]="promotionInformation"></app-valid-promotion>
   </div>
-
-  <!-- Si la cédula es inválida, muestra el componente InvalidPromotionComponent -->
-  <ng-template #invalid>
-    <app-invalid-promotion [cedula]="cedula" [message]="message"></app-invalid-promotion>
-  </ng-template>
 </div>

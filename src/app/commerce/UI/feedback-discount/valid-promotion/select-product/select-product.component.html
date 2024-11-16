@@ -23,7 +23,7 @@
     </div>
 
     <!-- Viscosidad Selector -->
-    <div *ngIf="referencia?.value">
+    <div *ngIf="referencia?.value && viscosidad?.value != 'EMPTY'">
       <label for="viscosidad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Seleccionar viscosidad
       </label>

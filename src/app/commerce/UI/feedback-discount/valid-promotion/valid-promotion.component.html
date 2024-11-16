@@ -1,5 +1,10 @@
 <div class="flex flex-col items-center justify-center h-full p-12 dark:bg-gray-800 rounded-lg shadow-lg max-w-5xl mx-auto text-center">
-  <h1 class="text-6xl font-bold text-green-500 mb-6">{{ message }}</h1>
-  <p class="text-xl text-white mb-6">Cédula: {{ cedula }}</p>
-  <app-select-product></app-select-product>
+  <h1 class="text-4xl font-bold text-white mb-6">{{promotionTitle}}</h1>
+  <h2 class="text-sm font-light text-yellow-50 mb-6">{{ promotionInformation?.messageInformation }}</h2>
+  <p class="text-xl text-white mb-6">Cédula: {{ promotionInformation?.identification }}</p>
+  <a  *ngIf="isPossibleToCreateRT"
+      [routerLink]="['/commerce/registerrt']" 
+      class="text-blue-300 hover:text-blue-100 underline font-medium">
+      Click aquí para registrar el Rappi Tendero</a>
+  <app-select-product *ngIf="promotionInformation?.validPromotion"></app-select-product>
 </div>

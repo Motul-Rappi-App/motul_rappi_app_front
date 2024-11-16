@@ -1,21 +1,39 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { SelectProductComponent } from './select-product/select-product.component';
+import { ValidatePromotionResponseEntity } from '../../../../core/models';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-valid-promotion',
   standalone: true,
-  imports: [SelectProductComponent],
+  imports: [SelectProductComponent, CommonModule, RouterModule],
   templateUrl: './valid-promotion.component.html',
   styleUrls: ['./valid-promotion.component.css'],
 })
-export class ValidPromotionComponent implements OnInit {
+export class ValidPromotionComponent{
 
-  @Input() message: string = '';
-  @Input() cedula: string | undefined;
+  @Input() promotionInformation: ValidatePromotionResponseEntity | null = null;
+  promotionData : ValidatePromotionResponseEntity | null = null;
 
-  constructor() { }
+  constructor( private router: Router) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    if(this.promotionInformation) this.promotionData = this.promotionInformation;
+    else this.router.navigate(['/commerce/reedem']);
+  }
+
+  ngOnDestroy(): void {
+    this.promotionInformation = null;
+    this.promotionData = null;
+  }
+
+  get promotionTitle(){
+    return this.promotionData?.validPromotion ? 'Promoción Valida' : 'Promoción Invalida';
+  }
+
+  get isPossibleToCreateRT(){
+    return this.promotionData?.doRegisterIn === 'CREATE_RT';
   }
 
 }
