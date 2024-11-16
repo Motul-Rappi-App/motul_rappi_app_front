@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AuthenticationRequestEntity, AuthenticationResponseEntity } from '../../../core/models';
 import { environment } from '../../../../environments/environment.development';
 import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
+import { LocalStorageService } from '../../../core/services';
 
 
 @Component({
@@ -23,7 +24,7 @@ export class UserLoginComponent {
 
   loginForm: FormGroup;
   captchaResolved: boolean = false;
-  recaptchaSiteKey: string = '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'; 
+  recaptchaSiteKey: string = environment.CAPTCHA_KEY; 
   isLoading: boolean = false;
 
   constructor(
@@ -31,7 +32,8 @@ export class UserLoginComponent {
     private _toast: ToastrService,
     private router: Router,
     private jwtServ: JwtLocalManageService,
-    private authServ: AuthService
+    private authServ: AuthService,
+    private localServ: LocalStorageService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -93,8 +95,9 @@ export class UserLoginComponent {
 
   successLogin(data: AuthenticationResponseEntity){
     this._toast.success('Bienvenido', 'Ingreso exitoso', environment.TOAST_CONFIG);
+    this.localServ.setCredentialsToLocal(data);
     this.jwtServ.setTokenToLocal(data.token);
-    this.router.navigate(['/commerce/lobby']);
+    this.router.navigate(['/commerce/lobby'], { replaceUrl: true });
   }
 
   invalidForm(){

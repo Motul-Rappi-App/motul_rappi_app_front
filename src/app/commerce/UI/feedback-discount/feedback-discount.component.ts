@@ -1,41 +1,34 @@
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { InvalidPromotionComponent } from './invalid-promotion/invalid-promotion.component';
+
+import { ValidatePromotionResponseEntity } from '../../../core/models';
 import { ValidPromotionComponent } from "./valid-promotion/valid-promotion.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-feedback-discount',
   standalone: true,
-  imports: [CommonModule, FormsModule, InvalidPromotionComponent, InvalidPromotionComponent, ValidPromotionComponent],
+  imports: [CommonModule, FormsModule, ValidPromotionComponent],
   templateUrl: './feedback-discount.component.html',
   styleUrls: ['./feedback-discount.component.css']
 })
-export class FeedbackDiscountComponent implements OnInit {
+export class FeedbackDiscountComponent implements OnInit{
 
-  @Input() cedula: string | undefined;
-  isValid: boolean = false;
-  message: string = '';
-
-  constructor() { }
+  promotionInformation: ValidatePromotionResponseEntity | null = null;
+  constructor( private router: Router) { }
 
   ngOnInit(): void {
-    const { cedula, valid, message } = history.state as { cedula: string, valid: boolean, message: string };
+    this.promotionInformation = history.state;
+    if(!this.promotionInformation) this.router.navigate(['/commerce/reedem']);
 
-    this.cedula = cedula;
-    this.isValid = valid;
-    this.message = message;
-
-    console.log(this.cedula, this.isValid, this.message);
-  }
-
-  // Función para validar la cédula
-  validateCedula(cedula: string): Promise<boolean> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(cedula.startsWith('1')); // Validación simulada
-      }, 1000); // Simulamos un retraso de 1 segundo
+    window.addEventListener('popstate', () => {
+      history.pushState(null, '', window.location.href);
     });
   }
 
+  ngOnDestroy(): void {
+    this.promotionInformation = null;
+    window.removeEventListener('popstate', () => {})
+  }
 }

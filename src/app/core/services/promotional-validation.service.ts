@@ -19,7 +19,7 @@ export class PromotionalValidationService {
 
   validatePromotion(validatePromotionRequest: ValidatePromotionRequestEntity): Observable<ValidatePromotionResponseEntity> | null{
     try {
-      return this.http.get<ValidatePromotionResponseEntity>(`${environment.BACKEND_URLS.BACKEND_BASE_URL_3}${this.path_back_url}`, { headers: this.jwtServ.tokenInHeaders || new HttpHeaders() });
+      return this.http.post<ValidatePromotionResponseEntity>(`${environment.BACKEND_URLS.BACKEND_BASE_URL_3}${this.path_back_url}`, validatePromotionRequest,{ headers: this.jwtServ.tokenInHeaders || new HttpHeaders() });
     } catch (error) {
       console.error(error);
       return null;

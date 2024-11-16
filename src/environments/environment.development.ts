@@ -8,5 +8,6 @@ export const environment = {
         BACKEND_BASE_URL_1:'http://localhost:8080/',
         BACKEND_BASE_URL_2:'http://localhost:8081/',
         BACKEND_BASE_URL_3:'http://localhost:8082/'
-    }
+    },
+    CAPTCHA_KEY: '6LfZaHcqAAAAANhjYSvv2qF8VZGnnY6FNUtV__ED'
 };
